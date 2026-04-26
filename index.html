@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpellStar ⭐ Kids Spelling Game</title>
+<style>
+  :root {
+    --sky: #38b2f5; --sun: #ffd93d; --grass: #6bcb77; --coral: #ff6b6b; --purple: #c77dff;
+    --bg: #e8f7ff; --card: #ffffff; --text: #2d3a4a; --muted: #7a92a8;
+    --radius: 20px; --shadow: 0 8px 32px rgba(56,178,245,0.13), 0 2px 8px rgba(0,0,0,0.07);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Comic Sans MS', 'Chalkboard SE', 'OpenDyslexic', sans-serif;
+    letter-spacing: 1.5px; word-spacing: 4px; background: var(--bg);
+    min-height: 100vh; overflow-x: hidden; color: var(--text);
+  }
+
+  .blob-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .blob { position: absolute; border-radius: 50%; opacity: 0.18; filter: blur(60px); animation: blobMove 12s ease-in-out infinite alternate; }
+  .blob-1 { width: 400px; height: 400px; background: var(--sky); top: -100px; left: -80px; }
+  .blob-2 { width: 350px; height: 350px; background: var(--sun); top: 40%; right: -80px; animation-delay: 3s; }
+  .blob-3 { width: 300px; height: 300px; background: var(--grass); bottom: -80px; left: 20%; animation-delay: 6s; }
+  .blob-4 { width: 250px; height: 250px; background: var(--coral); top: 20%; left: 50%; animation-delay: 9s; }
+  @keyframes blobMove { from { transform: translate(0,0) scale(1); } to { transform: translate(30px, 20px) scale(1.1); } }
+
+  .container { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; padding: 20px 16px 60px; }
+
+  .header { text-align: center; padding: 24px 0 18px; }
+  .header h1 { font-size: 3rem; color: var(--sky); font-weight: bold; text-shadow: 3px 3px 0 #fff, 5px 5px 0 rgba(56,178,245,0.2); }
+
+  .lang-tabs { display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; }
+  .lang-tab { padding: 8px 24px; border-radius: 50px; border: 2.5px solid var(--sky); font-weight: bold; font-family: inherit; cursor: pointer; background: transparent; color: var(--sky); transition: 0.2s; }
+  .lang-tab.active { background: var(--sky); color: #fff; box-shadow: 0 4px 16px rgba(56,178,245,0.35); }
+
+  .nav-strip { display: flex; justify-content: center; gap: 6px; margin-bottom: 20px; flex-wrap: wrap;}
+  .nav-btn { padding: 8px 18px; border-radius: 50px; border: 2.5px solid transparent; font-family: inherit; font-weight: bold; cursor: pointer; background: #fff; color: var(--muted); transition: 0.2s;}
+  .nav-btn.active { border-color: var(--sky); color: var(--sky); background: #f0f8ff; }
+
+  .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; margin-bottom: 16px; animation: slideUp 0.4s ease; }
+  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .card-title { font-size: 1.6rem; font-weight: bold; color: var(--sky); margin-bottom: 16px; text-align: center; }
+
+  .btn { padding: 10px 18px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; font-family: inherit; transition: 0.18s; display: inline-flex; align-items: center; gap: 6px; justify-content: center; }
+  .btn-primary { background: var(--sky); color: #fff; }
+  .btn-success { background: var(--grass); color: #fff; }
+  .btn-danger { background: var(--coral); color: #fff; }
+  .btn-outline { background: transparent; border: 2px solid var(--sky); color: var(--sky); }
+  .btn-sm { padding: 6px 12px; font-size: 0.85rem; border-radius: 8px; }
+
+  .difficulty-row { display: flex; gap: 8px; margin: 15px 0; flex-wrap: wrap; justify-content: center; }
+  .diff-btn { padding: 8px 20px; border-radius: 50px; border: 2.5px solid #d0e8f8; font-weight: bold; cursor: pointer; background: #f4faff; color: var(--muted); }
+  .diff-btn.active { border-color: var(--purple); color: var(--purple); background: #f6eeff; }
+
+  .word-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; justify-content: center; }
+  .word-chip { background: #f8f9fa; border: 2px solid #e2e8f0; border-radius: 50px; padding: 6px 16px; font-weight: bold; cursor: pointer; transition: 0.2s; color: var(--muted); }
+  .word-chip.selected { background: #e8fff0; border-color: var(--grass); color: var(--text); transform: translateY(-2px); }
+  .chip-del { background: none; border: none; color: var(--coral); font-weight: bold; margin-left: 8px; cursor: pointer; }
+
+  .word-display { text-align: center; padding: 28px 16px; background: linear-gradient(135deg, #f0f8ff 0%, #faf4ff 100%); border-radius: 18px; margin-bottom: 18px; border: 2.5px solid #e0efff; }
+  .word-letters { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px; }
+  .letter-box { width: 48px; height: 56px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; }
+  .letter-known { background: #e8f5ff; color: var(--text); border: 2px solid #c8e0f0; }
+  .letter-blank { border: 3px dashed #aaa; background: #fff; }
+  .letter-blank.filled { border: 3px solid var(--grass); background: #f0fff4; }
+  .letter-blank.wrong-fill { border-color: var(--coral); background: #fff0f0; animation: shake 0.4s; }
+
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+
+  .letter-choices { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; justify-content: center;}
+  .letter-btn { width: 54px; height: 54px; border-radius: 12px; border: none; font-weight: bold; font-size: 1.6rem; cursor: pointer; background: #fff; box-shadow: 0 4px 0 rgba(0,0,0,0.1); }
+  
+  section { display: none; }
+  section.active { display: block; }
+</style>
+</head>
+<body>
+
+<div class="blob-bg">
+  <div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div><div class="blob blob-4"></div>
+</div>
+
+<div class="container">
+  <div class="header">
+    <h1>⭐ SpellStar</h1>
+    <p class="tagline" id="ui-tagline">The fun spelling adventure for kids!</p>
+  </div>
+
+  <div class="lang-tabs">
+    <button class="lang-tab active" id="btn-en" onclick="switchLang('en')">🇬🇧 English</button>
+    <button class="lang-tab" id="btn-bm" onclick="switchLang('bm')">🇲🇾 Bahasa Malaysia</button>
+  </div>
+
+  <div class="nav-strip">
+    <button class="nav-btn active" onclick="showSection('home')" id="ui-nav-home">🏠 Home</button>
+    <button class="nav-btn" onclick="showSection('rewards')" id="ui-nav-rewards">🎁 Rewards</button>
+    <button class="nav-btn" onclick="showSection('history')" id="ui-nav-history">🏆 History</button>
+    <button class="nav-btn" onclick="showSection('setup')" id="ui-nav-words">🔒 Words</button>
+  </div>
+
+  <section id="home-section" class="active">
+    <div class="card" style="text-align:center; padding: 40px 20px;">
+        <h2 id="ui-home-welcome">Welcome!</h2>
+        <button class="btn btn-success" onclick="startTestLobby()" style="font-size:1.8rem; padding:20px 40px; margin-top:20px;">🚀 PLAY NOW!</button>
+    </div>
+  </section>
+
+  <section id="selection-section">
+    <div class="card">
+      <div class="card-title" id="ui-sel-title">Game Settings</div>
+      
+      <p style="text-align:center; font-weight:bold; color:var(--muted);" id="ui-diff-label">DIFFICULTY:</p>
+      <div class="difficulty-row">
+        <button class="diff-btn active" id="diff-easy" onclick="setDiff('easy')">😊 Easy</button>
+        <button class="diff-btn" id="diff-medium" onclick="setDiff('medium')">🤔 Medium</button>
+        <button class="diff-btn" id="diff-hard" onclick="setDiff('hard')">😤 Hard</button>
+      </div>
+
+      <hr style="border:none; border-top:2px dashed #eee; margin:20px 0;">
+      
+      <p style="text-align:center; font-weight:bold; color:var(--muted);" id="ui-sel-words-label">PICK WORDS:</p>
+      <div style="display:flex; gap:8px; justify-content:center; margin-bottom:10px;">
+        <button class="btn btn-sm btn-outline" onclick="selectAllSel()">Select All</button>
+        <button class="btn btn-sm btn-outline" onclick="deselectAllSel()">None</button>
+      </div>
+      <div class="word-chips" id="selection-chips"></div>
+
+      <div style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
+         <button class="btn btn-outline" onclick="goHome()">🏠 Back</button>
+         <button class="btn btn-success" onclick="confirmStart()" style="font-size:1.2rem; padding: 12px 30px;">Go! 🚀</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="setup-section">
+    <div class="card">
+      <div class="card-title" id="lang-title">📖 My Word List</div>
+      <div style="display:flex; gap:8px; margin-bottom:15px;">
+        <input type="text" id="word-input" placeholder="Type here..." style="flex:1; padding:12px; border-radius:10px; border:2px solid #ddd;">
+        <button class="btn btn-primary" onclick="addWord()">➕ Add</button>
+      </div>
+      <div class="word-chips" id="word-chips"></div>
+      <button class="btn btn-danger btn-sm" onclick="clearWords()">🗑️ Clear All</button>
+    </div>
+  </section>
+
+  <section id="test-section">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:10px;">
+        <span id="word-counter"></span>
+        <div id="timer-display" style="color:var(--coral);"></div>
+      </div>
+      <div class="word-display"><div class="word-letters" id="word-letters"></div></div>
+      <div id="choices-area"></div>
+      <div id="feedback-area" style="text-align:center; font-weight:bold; height:30px; margin-top:10px;"></div>
+      <div style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
+        <button class="btn btn-primary" onclick="speakWord()">🔊 Hear</button>
+        <button class="btn btn-success" id="next-btn" onclick="nextWord()" style="display:none;">Next ➡️</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="complete-section"><div class="card" style="text-align:center;"><h2>🎉 Great Job!</h2><h3 id="final-score"></h3><button class="btn btn-primary" onclick="goHome()">🏠 Home</button></div></section>
+</div>
+
+<script>
+let language = 'en', difficulty = 'easy', isParentUnlocked = false;
+let wordLists = {
+  en: JSON.parse(localStorage.getItem('words_en') || '["cat","dog","bird","sun","moon"]'),
+  bm: JSON.parse(localStorage.getItem('words_bm') || '["kucing","anjing","burung","matahari","bulan"]')
+};
+let selectedWords = [], testWords = [], current = 0, score = 0;
+let answerWord = '', missIdx = [], blankFills = {};
+
+const DICT = {
+  en: { welcome: "Welcome!", diffLabel: "DIFFICULTY:", selWords: "PICK WORDS:", navHome: "🏠 Home", navWords: "🔒 Words" },
+  bm: { welcome: "Selamat Datang!", diffLabel: "TAHAP:", selWords: "PILIH PERKATAAN:", navHome: "🏠 Utama", navWords: "🔒 Kata" }
+};
+
+function switchLang(lang) {
+  language = lang;
+  document.getElementById('btn-en').classList.toggle('active', lang==='en');
+  document.getElementById('btn-bm').classList.toggle('active', lang==='bm');
+  document.getElementById('ui-home-welcome').textContent = DICT[lang].welcome;
+  document.getElementById('ui-diff-label').textContent = DICT[lang].diffLabel;
+  document.getElementById('ui-sel-words-label').textContent = DICT[lang].selWords;
+  document.getElementById('ui-nav-home').textContent = DICT[lang].navHome;
+  document.getElementById('ui-nav-words').textContent = DICT[lang].navWords;
+  renderChips();
+}
+
+function renderChips() {
+  const wrap = document.getElementById('word-chips');
+  wrap.innerHTML = wordLists[language].map((w, i) => `<span class="word-chip">${w}<button class="chip-del" onclick="removeWord(${i})">✕</button></span>`).join('');
+}
+
+function addWord() {
+  const inp = document.getElementById('word-input');
+  const val = inp.value.trim().toLowerCase();
+  if(val && !wordLists[language].includes(val)) { wordLists[language].push(val); save(); renderChips(); inp.value=''; }
+}
+function removeWord(i) { wordLists[language].splice(i,1); save(); renderChips(); }
+function save() { localStorage.setItem('words_'+language, JSON.stringify(wordLists[language])); }
+
+function setDiff(d) {
+  difficulty = d;
+  document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('diff-'+d).classList.add('active');
+}
+
+function startTestLobby() {
+  if(wordLists[language].length === 0) return alert("Add words first!");
+  selectedWords = [...wordLists[language]];
+  showSection('selection');
+  renderLobby();
+}
+
+function renderLobby() {
+  const wrap = document.getElementById('selection-chips');
+  wrap.innerHTML = wordLists[language].map(w => {
+    const sel = selectedWords.includes(w) ? 'selected' : '';
+    return `<span class="word-chip ${sel}" onclick="toggleSel('${w}')">${w}</span>`;
+  }).join('');
+}
+
+function toggleSel(w) {
+  if(selectedWords.includes(w)) selectedWords = selectedWords.filter(x => x!==w);
+  else selectedWords.push(w);
+  renderLobby();
+}
+
+function selectAllSel() { selectedWords = [...wordLists[language]]; renderLobby(); }
+function deselectAllSel() { selectedWords = []; renderLobby(); }
+
+function confirmStart() {
+  if(selectedWords.length === 0) return alert("Select at least one word!");
+  // TRUE SHUFFLE
+  testWords = [...selectedWords].sort(() => Math.random() - 0.5);
+  current = 0; score = 0;
+  showSection('test');
+  nextWord();
+}
+
+function nextWord() {
+  if(current >= testWords.length) return showComplete();
+  answerWord = testWords[current];
+  blankFills = {}; missIdx = [];
+  document.getElementById('next-btn').style.display = 'none';
+  document.getElementById('feedback-area').textContent = '';
+  document.getElementById('word-counter').textContent = `Word ${current+1} / ${testWords.length}`;
+  
+  const bCount = difficulty === 'easy' ? 1 : difficulty === 'medium' ? 2 : 3;
+  let pos = []; for(let i=1; i<answerWord.length; i++) pos.push(i);
+  missIdx = pos.sort(() => Math.random()-0.5).slice(0, Math.min(bCount, pos.length));
+
+  renderTestUI();
+  speakWord();
+}
+
+function renderTestUI() {
+  document.getElementById('word-letters').innerHTML = answerWord.split('').map((c, i) => 
+    missIdx.includes(i) ? `<div class="letter-box letter-blank" id="blank-${i}">?</div>` : `<div class="letter-box letter-known">${c}</div>`
+  ).join('');
+
+  document.getElementById('choices-area').innerHTML = missIdx.map(idx => {
+    const correct = answerWord[idx];
+    const opts = [correct, ...("abcdefghijklmnopqrstuvwxyz".split('').filter(x=>x!==correct).sort(()=>Math.random()-0.5).slice(0,2))].sort();
+    return `<div class="letter-choices">${opts.map(o => `<button class="letter-btn" onclick="fill(${idx},'${o}',this)">${o}</button>`).join('')}</div>`;
+  }).join('');
+}
+
+function fill(idx, char, btn) {
+  if(blankFills[idx]) return;
+  blankFills[idx] = char;
+  const box = document.getElementById('blank-'+idx);
+  box.textContent = char; box.classList.add('filled');
+  btn.style.opacity = '0.4';
+  if(Object.keys(blankFills).length === missIdx.length) check();
+}
+
+function check() {
+  const win = missIdx.every(idx => blankFills[idx] === answerWord[idx]);
+  const fb = document.getElementById('feedback-area');
+  if(win) { score++; fb.textContent = "⭐ Great!"; fb.style.color = "var(--grass)"; }
+  else { fb.textContent = "❌ No, it was " + answerWord; fb.style.color = "var(--coral)"; }
+  current++; document.getElementById('next-btn').style.display = 'inline-flex';
+}
+
+// MALAYSIA VOICE FIX
+function speakWord() {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  
+  const u = new SpeechSynthesisUtterance(answerWord);
+  const voices = window.speechSynthesis.getVoices();
+  
+  if (language === 'bm') {
+    // Cari ms-MY secara spesifik
+    const malayVoice = voices.find(v => v.lang.includes('ms-MY') || v.lang.includes('ms_MY') || v.name.toLowerCase().includes('malay'));
+    if (malayVoice) {
+      u.voice = malayVoice;
+      u.lang = 'ms-MY';
+    } else {
+      // Fallback ke Indonesia jika tiada Malaysia (bunyi hampir sama)
+      const idVoice = voices.find(v => v.lang.startsWith('id'));
+      if (idVoice) u.voice = idVoice;
+      u.lang = 'ms-MY';
+    }
+  } else {
+    u.lang = 'en-US';
+  }
+  
+  u.rate = 0.8;
+  u.pitch = 1.0;
+  window.speechSynthesis.speak(u);
+}
+
+function showSection(id) {
+  if(id === 'setup' && !isParentUnlocked) {
+    const p = prompt("Password (UNLOCK):");
+    if(p !== 'UNLOCK') return;
+    isParentUnlocked = true;
+  }
+  document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id+'-section').classList.add('active');
+}
+
+function showComplete() { showSection('complete'); document.getElementById('final-score').textContent = `${score} / ${testWords.length}`; }
+function goHome() { showSection('home'); }
+function clearWords() { if(confirm("Clear?")) { wordLists[language]=[]; save(); renderChips(); } }
+function quitGame() { if(confirm("Quit?")) goHome(); }
+
+// Pre-load voices
+window.speechSynthesis.onvoiceschanged = () => {
+  window.speechSynthesis.getVoices();
+};
+
+switchLang('en');
+</script>
+</body>
+</html>
