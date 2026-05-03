@@ -30,9 +30,12 @@
   .header { text-align: center; padding: 24px 0 18px; }
   .header h1 { font-size: 3rem; color: var(--sky); font-weight: bold; text-shadow: 3px 3px 0 #fff, 5px 5px 0 rgba(56,178,245,0.2); }
 
-  /* Music toggle */
-  .music-toggle {
+  /* Music toggle + track info */
+  .music-wrap {
     position: fixed; bottom: 18px; right: 18px; z-index: 999;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 6px;
+  }
+  .music-toggle {
     width: 52px; height: 52px; border-radius: 50%; border: none;
     background: var(--sky); color: #fff; font-size: 1.5rem;
     box-shadow: 0 4px 16px rgba(56,178,245,0.45); cursor: pointer;
@@ -41,6 +44,25 @@
   }
   .music-toggle:hover { transform: scale(1.1); }
   .music-toggle.muted { background: var(--muted); }
+  .track-label {
+    background: rgba(255,255,255,0.92); border-radius: 50px;
+    padding: 4px 12px; font-size: 0.72rem; font-weight: bold;
+    color: var(--sky); box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    white-space: nowrap; transition: opacity 0.4s;
+    border: 1.5px solid #d0edff;
+  }
+  .track-label.hidden { opacity: 0; pointer-events: none; }
+
+  /* Next-track button */
+  .music-next {
+    width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--sky);
+    background: #fff; color: var(--sky); font-size: 1rem;
+    box-shadow: 0 2px 8px rgba(56,178,245,0.2); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: 0.2s;
+  }
+  .music-next:hover { background: var(--sky); color: #fff; transform: scale(1.1); }
+
   @keyframes popIn { from{transform:scale(0);} to{transform:scale(1);} }
 
   .lang-tabs { display: flex; gap: 6px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
@@ -131,86 +153,36 @@
   .mdiff-btn { padding: 8px 18px; border-radius: 50px; border: 2.5px solid #ffd9a0; font-weight: bold; cursor: pointer; background: #fff8ee; color: var(--muted); font-family: inherit; transition: 0.2s; font-size: 0.9rem; }
   .mdiff-btn.active { border-color: var(--orange); color: var(--orange); background: #fff3e0; }
 
-  /* ══ MANDARIN STYLES ══ */
-  /* Character card hero display */
-  .zh-hero {
-    text-align: center; padding: 28px 16px 20px;
-    background: linear-gradient(135deg, #fff5f5 0%, #fff9f0 100%);
-    border-radius: 18px; margin-bottom: 18px; border: 2.5px solid #fecaca;
-    position: relative;
-  }
-  .zh-char-big {
-    font-size: 5rem; line-height: 1; display: block; margin-bottom: 8px;
-    font-family: 'PingFang SC','Microsoft YaHei','SimSun',serif;
-    color: var(--zh); text-shadow: 2px 2px 0 #fff, 4px 4px 0 rgba(229,62,62,0.15);
-  }
+  /* Mandarin */
+  .zh-hero { text-align: center; padding: 28px 16px 20px; background: linear-gradient(135deg, #fff5f5 0%, #fff9f0 100%); border-radius: 18px; margin-bottom: 18px; border: 2.5px solid #fecaca; position: relative; }
+  .zh-char-big { font-size: 5rem; line-height: 1; display: block; margin-bottom: 8px; font-family: 'PingFang SC','Microsoft YaHei','SimSun',serif; color: var(--zh); text-shadow: 2px 2px 0 #fff, 4px 4px 0 rgba(229,62,62,0.15); }
   .zh-pinyin { font-size: 1.4rem; color: var(--orange); font-weight: bold; margin-bottom: 4px; letter-spacing: 3px; }
   .zh-meaning { font-size: 1rem; color: var(--muted); }
-  .zh-strokes-badge {
-    position: absolute; top: 12px; right: 14px;
-    background: #fff; border: 2px solid #fecaca; border-radius: 50px;
-    padding: 3px 10px; font-size: 0.8rem; color: var(--zh); font-weight: bold;
-  }
-
-  /* Mandarin choice buttons */
+  .zh-strokes-badge { position: absolute; top: 12px; right: 14px; background: #fff; border: 2px solid #fecaca; border-radius: 50px; padding: 3px 10px; font-size: 0.8rem; color: var(--zh); font-weight: bold; }
   .zh-choices { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 16px; }
-  .zh-btn {
-    border-radius: 14px; border: 2.5px solid #e2e8f0; font-weight: bold;
-    font-size: 1rem; cursor: pointer; background: #fff;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.08); transition: 0.15s; font-family: inherit;
-    padding: 12px 18px; text-align: center; min-width: 120px;
-  }
+  .zh-btn { border-radius: 14px; border: 2.5px solid #e2e8f0; font-weight: bold; font-size: 1rem; cursor: pointer; background: #fff; box-shadow: 0 4px 0 rgba(0,0,0,0.08); transition: 0.15s; font-family: inherit; padding: 12px 18px; text-align: center; min-width: 120px; }
   .zh-btn:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--zh); }
   .zh-btn:disabled { opacity: 0.55; cursor: not-allowed; }
   .zh-btn.correct-flash { background: #d4f5d4; border-color: var(--grass); }
   .zh-btn.wrong-flash   { background: #ffd4d4; border-color: var(--coral); }
   .zh-btn .zh-btn-char { font-size: 1.8rem; display: block; font-family: 'PingFang SC','Microsoft YaHei','SimSun',serif; color: var(--zh); margin-bottom: 2px; }
   .zh-btn .zh-btn-pin  { font-size: 0.75rem; color: var(--muted); }
-
-  /* Pinyin choice buttons (text only) */
-  .zh-pin-btn {
-    border-radius: 14px; border: 2.5px solid #e2e8f0; font-weight: bold;
-    font-size: 1.1rem; cursor: pointer; background: #fff;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.08); transition: 0.15s; font-family: inherit;
-    padding: 12px 20px; min-width: 90px; text-align: center; color: var(--text);
-  }
+  .zh-pin-btn { border-radius: 14px; border: 2.5px solid #e2e8f0; font-weight: bold; font-size: 1.1rem; cursor: pointer; background: #fff; box-shadow: 0 4px 0 rgba(0,0,0,0.08); transition: 0.15s; font-family: inherit; padding: 12px 20px; min-width: 90px; text-align: center; color: var(--text); }
   .zh-pin-btn:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--orange); }
   .zh-pin-btn:disabled { opacity: 0.55; cursor: not-allowed; }
   .zh-pin-btn.correct-flash { background: #d4f5d4; border-color: var(--grass); }
   .zh-pin-btn.wrong-flash   { background: #ffd4d4; border-color: var(--coral); }
-
-  /* Stroke count buttons */
-  .zh-stroke-btn {
-    border-radius: 14px; border: 2.5px solid #e2e8f0; font-weight: bold;
-    font-size: 1.5rem; cursor: pointer; background: #fff;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.08); transition: 0.15s; font-family: inherit;
-    width: 72px; height: 68px;
-  }
+  .zh-stroke-btn { border-radius: 14px; border: 2.5px solid #e2e8f0; font-weight: bold; font-size: 1.5rem; cursor: pointer; background: #fff; box-shadow: 0 4px 0 rgba(0,0,0,0.08); transition: 0.15s; font-family: inherit; width: 72px; height: 68px; }
   .zh-stroke-btn:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--purple); }
   .zh-stroke-btn:disabled { opacity: 0.55; cursor: not-allowed; }
   .zh-stroke-btn.correct-flash { background: #d4f5d4; border-color: var(--grass); }
   .zh-stroke-btn.wrong-flash   { background: #ffd4d4; border-color: var(--coral); }
-
   .zh-q-label { font-size: 1rem; color: var(--zh); font-weight: bold; text-align: center; margin-bottom: 10px; }
-  .zh-game-type-badge {
-    display: inline-block; padding: 4px 14px; border-radius: 50px;
-    font-size: 0.8rem; font-weight: bold; background: #fff5f5;
-    color: var(--zh); border: 1.5px solid #fecaca; margin-bottom: 12px;
-    text-align: center; width: 100%;
-  }
-
-  /* Mandarin word list chips */
-  .zh-word-chip {
-    background: #fff5f5; border: 2px solid #fecaca; border-radius: 12px;
-    padding: 8px 16px; font-weight: bold; cursor: pointer; transition: 0.2s;
-    color: var(--text); font-family: 'PingFang SC','Microsoft YaHei','SimSun',serif;
-    font-size: 1.1rem; display: inline-flex; align-items: center; gap: 6px;
-  }
+  .zh-game-type-badge { display: inline-block; padding: 4px 14px; border-radius: 50px; font-size: 0.8rem; font-weight: bold; background: #fff5f5; color: var(--zh); border: 1.5px solid #fecaca; margin-bottom: 12px; text-align: center; width: 100%; }
+  .zh-word-chip { background: #fff5f5; border: 2px solid #fecaca; border-radius: 12px; padding: 8px 16px; font-weight: bold; cursor: pointer; transition: 0.2s; color: var(--text); font-family: 'PingFang SC','Microsoft YaHei','SimSun',serif; font-size: 1.1rem; display: inline-flex; align-items: center; gap: 6px; }
   .zh-word-chip .zh-chip-pin { font-size: 0.7rem; color: var(--muted); font-family: inherit; }
   .zh-word-chip.selected { background: #e8fff0; border-color: var(--grass); }
   .zh-chip-del { background: none; border: none; color: var(--coral); font-weight: bold; margin-left: 4px; cursor: pointer; font-size: 0.9rem; }
-
-  /* Mandarin setup section */
   .zh-game-btns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 10px 0; }
   .zh-game-btn { padding: 10px 16px; border-radius: 12px; border: 2.5px solid #fecaca; font-weight: bold; cursor: pointer; background: #fff5f5; color: var(--muted); font-family: inherit; transition: 0.2s; font-size: 0.88rem; text-align: center; }
   .zh-game-btn.active { border-color: var(--zh); color: var(--zh); background: #fff0f0; }
@@ -222,12 +194,8 @@
   .math-bar  { background: linear-gradient(90deg, var(--orange), var(--sun)); }
   .zh-bar    { background: linear-gradient(90deg, var(--zh), var(--orange)); }
 
-  /* Image scan */
-  .scan-drop-zone {
-    border: 3px dashed #b8d8f0; border-radius: 16px; padding: 28px 16px;
-    text-align: center; cursor: pointer; transition: 0.2s; background: #f6fbff;
-    position: relative; margin: 14px 0;
-  }
+  /* Scan (kept for zh, removed for en/bm) */
+  .scan-drop-zone { border: 3px dashed #b8d8f0; border-radius: 16px; padding: 28px 16px; text-align: center; cursor: pointer; transition: 0.2s; background: #f6fbff; position: relative; margin: 14px 0; }
   .scan-drop-zone.zh-scan { border-color: #fecaca; background: #fff8f8; }
   .scan-drop-zone:hover, .scan-drop-zone.drag-over { border-color: var(--sky); background: #e8f5ff; transform: scale(1.01); }
   .scan-drop-zone.zh-scan:hover, .scan-drop-zone.zh-scan.drag-over { border-color: var(--zh); background: #fff0f0; }
@@ -242,9 +210,6 @@
   .scan-status.success { background: #e8fff0; color: var(--grass); display: block; }
   .scan-status.error   { background: #fff0f0; color: var(--coral); display: block; }
   .scan-word-preview { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; justify-content: center; }
-  .scan-word-chip { background: #f0f8ff; border: 2px solid var(--sky); border-radius: 50px; padding: 4px 14px; font-weight: bold; font-size: 0.9rem; color: var(--text); cursor: pointer; transition: 0.15s; font-family: inherit; }
-  .scan-word-chip.excluded { background: #fff0f0; border-color: #f5c6c6; color: #ccc; text-decoration: line-through; }
-  /* Mandarin scan chips */
   .scan-zh-chip { background: #fff5f5; border: 2px solid #fecaca; border-radius: 10px; padding: 6px 14px; font-weight: bold; cursor: pointer; transition: 0.15s; display: inline-flex; flex-direction: column; align-items: center; gap: 2px; }
   .scan-zh-chip .c { font-size: 1.4rem; font-family: 'PingFang SC','Microsoft YaHei','SimSun',serif; color: var(--zh); }
   .scan-zh-chip .p { font-size: 0.68rem; color: var(--orange); }
@@ -261,7 +226,15 @@
   <div class="blob blob-1"></div><div class="blob blob-2"></div>
   <div class="blob blob-3"></div><div class="blob blob-4"></div>
 </div>
-<button class="music-toggle" id="music-btn" onclick="toggleMusic()" title="Toggle music">🎵</button>
+
+<!-- Music controls -->
+<div class="music-wrap">
+  <div class="track-label hidden" id="track-label">🎵 Adventure</div>
+  <div style="display:flex;gap:6px;align-items:center;">
+    <button class="music-next" onclick="nextTrack()" title="Next track">⏭</button>
+    <button class="music-toggle" id="music-btn" onclick="toggleMusic()" title="Toggle music">🎵</button>
+  </div>
+</div>
 
 <div class="container">
   <div class="header">
@@ -340,27 +313,7 @@
         <button class="btn btn-outline btn-sm" onclick="goHome()" id="ui-back-btn2">🏠 Back</button>
       </div>
     </div>
-    <!-- IMAGE SCAN CARD -->
-    <div class="card" id="scan-card">
-      <div class="card-title" id="scan-card-title" style="color:var(--purple);">📷 Scan Image for Words</div>
-      <p id="scan-card-sub" style="text-align:center;color:var(--muted);font-size:0.88rem;margin-bottom:4px;">
-        Upload a photo of a worksheet, book page, or word list — AI will extract the words!
-      </p>
-      <div class="scan-drop-zone" id="scan-drop-zone"
-        ondragover="scanDragOver(event)" ondragleave="scanDragLeave(event)" ondrop="scanDrop(event)">
-        <input type="file" id="scan-file-input" accept="image/*" onchange="scanFileSelected(event)">
-        <span class="scan-icon">🖼️</span>
-        <div class="scan-label" id="scan-label-text">Tap to upload image</div>
-        <div class="scan-sub">or drag &amp; drop · JPG, PNG, HEIC</div>
-      </div>
-      <img id="scan-preview" class="scan-preview" alt="preview">
-      <div class="scan-status" id="scan-status"></div>
-      <div class="scan-word-preview" id="scan-word-preview"></div>
-      <div class="scan-actions" id="scan-actions" style="display:none;">
-        <button class="btn btn-sm btn-outline" onclick="scanReset()">🔄 Scan Again</button>
-        <button class="btn btn-success" id="scan-add-btn" onclick="scanAddWords()" style="font-size:1rem;padding:10px 22px;">➕ Add to Word List</button>
-      </div>
-    </div>
+    <!-- Scan removed: requires server-side proxy. Use the Mandarin scan below for 汉字 worksheets. -->
   </section>
 
   <!-- MANDARIN WORD LIST (parent) -->
@@ -388,16 +341,13 @@
         <button class="btn btn-sm" style="border:2px solid var(--zh);color:var(--zh);background:transparent;" onclick="zhSelectNone()">None</button>
       </div>
       <div class="word-chips" id="zh-selection-chips"></div>
-      <p id="zh-empty-hint" style="text-align:center;color:var(--muted);font-size:0.85rem;display:none;">
-        No characters yet! Scan a worksheet below 👇
-      </p>
+      <p id="zh-empty-hint" style="text-align:center;color:var(--muted);font-size:0.85rem;display:none;">No characters yet! Scan a worksheet below 👇</p>
       <div style="display:flex;gap:10px;justify-content:center;margin-top:20px;">
         <button class="btn btn-outline" onclick="goHome()">🏠 Back</button>
         <button class="btn btn-zh" onclick="startZhGame()" style="font-size:1.2rem;padding:12px 30px;">开始! 🚀</button>
       </div>
     </div>
 
-    <!-- Mandarin word manager -->
     <div class="card">
       <div class="card-title" style="color:var(--zh);font-size:1.2rem;">✏️ Add Characters Manually</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 2fr;gap:8px;margin-bottom:12px;">
@@ -420,7 +370,7 @@
       </div>
     </div>
 
-    <!-- Mandarin image scan -->
+    <!-- Mandarin image scan (kept — can be proxied separately) -->
     <div class="card">
       <div class="card-title" style="color:var(--zh);">📷 Scan Worksheet</div>
       <p style="text-align:center;color:var(--muted);font-size:0.88rem;margin-bottom:4px;">
@@ -566,72 +516,341 @@
 
 <script>
 // ══════════════════════════════════════════
-//  AUDIO ENGINE
+//  🎵 UPGRADED MUSIC ENGINE
+//  Multiple tracks: Adventure, Lullaby, Disco, Underwater, Hero March
 // ══════════════════════════════════════════
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
-let audioCtx = null, musicOn = true, melodyActive = false, melodyGain = null, melodyIdx = 0, melodyTimeout = null;
-const MELODY = [261.63,293.66,329.63,349.23,392.00,349.23,329.63,293.66];
-const MDUR = 0.35;
+let audioCtx = null;
+let musicOn = true, musicStarted = false;
+let currentTrackIdx = 0;
+let trackScheduler = null; // holds the stop function for active track
+
+// ── Note helpers ──
+const NOTE = {
+  C3:130.81, D3:146.83, E3:164.81, F3:174.61, G3:196.00, A3:220.00, B3:246.94,
+  C4:261.63, D4:293.66, E4:329.63, F4:349.23, G4:392.00, A4:440.00, B4:493.88,
+  C5:523.25, D5:587.33, E5:659.25, F5:698.46, G5:783.99, A5:880.00, B5:987.77,
+  C6:1046.50, R:0
+};
 
 function getACtx() {
   if (!audioCtx) audioCtx = new AudioCtx();
   if (audioCtx.state === 'suspended') audioCtx.resume();
   return audioCtx;
 }
+
+// ── Generic sequencer ──
+// plays notes[] = [{freq, dur, vol?, type?}] in a loop
+// returns a stop() function
+function makeSequencer(notes, bpm=120, masterVol=0.08) {
+  let active = true;
+  let step = 0;
+  let nextTime = 0;
+  const beatDur = 60 / bpm;
+  const ctx = getACtx();
+
+  // master gain
+  const master = ctx.createGain();
+  master.gain.value = masterVol;
+
+  // reverb (convolver via impulse)
+  const reverb = ctx.createGain();
+  reverb.gain.value = 0.18;
+  const dry = ctx.createGain();
+  dry.gain.value = 1;
+
+  master.connect(dry); dry.connect(ctx.destination);
+  master.connect(reverb); reverb.connect(ctx.destination);
+
+  function scheduleNote(note, when) {
+    if (!note.freq || note.freq === 0) return; // rest
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.connect(g); g.connect(master);
+    o.type = note.type || 'sine';
+    o.frequency.value = note.freq;
+    const v = note.vol !== undefined ? note.vol : 1;
+    const dur = note.dur * beatDur;
+    g.gain.setValueAtTime(0, when);
+    g.gain.linearRampToValueAtTime(v, when + 0.015);
+    g.gain.setValueAtTime(v, when + dur * 0.65);
+    g.gain.exponentialRampToValueAtTime(0.0001, when + dur * 0.97);
+    o.start(when);
+    o.stop(when + dur + 0.05);
+  }
+
+  function tick() {
+    if (!active) return;
+    const ctx2 = getACtx();
+    const now = ctx2.currentTime;
+    if (nextTime === 0) nextTime = now + 0.05;
+
+    // Schedule a buffer of 0.5s ahead
+    while (nextTime < now + 0.5) {
+      const note = notes[step % notes.length];
+      scheduleNote(note, nextTime);
+      nextTime += note.dur * beatDur;
+      step++;
+    }
+    trackScheduler._timer = setTimeout(tick, 150);
+  }
+
+  tick();
+  const stopper = {
+    stop() {
+      active = false;
+      clearTimeout(stopper._timer);
+      try { master.disconnect(); reverb.disconnect(); dry.disconnect(); } catch(e){}
+    },
+    _timer: null
+  };
+  trackScheduler = stopper;
+  return stopper;
+}
+
+// ── Bass layer (simple sine bass) ──
+function makeBass(notes, bpm=120, vol=0.06) {
+  return makeSequencer(notes.map(n => ({...n, type:'sine', vol: n.vol||0.8})), bpm, vol);
+}
+
+// ══════════════════════════════════════════
+//  TRACK DEFINITIONS
+// ══════════════════════════════════════════
+
+const TRACKS = [
+
+  // ① ADVENTURE QUEST — cheerful pentatonic loop, xylophone-like
+  {
+    name: '🌟 Adventure Quest',
+    bpm: 138,
+    vol: 0.07,
+    type: 'triangle',
+    notes: [
+      {freq:NOTE.C5, dur:0.5}, {freq:NOTE.E5, dur:0.5}, {freq:NOTE.G5, dur:0.5}, {freq:NOTE.E5, dur:0.5},
+      {freq:NOTE.C5, dur:0.5}, {freq:NOTE.G4, dur:0.5}, {freq:NOTE.A4, dur:0.5}, {freq:NOTE.C5, dur:0.5},
+      {freq:NOTE.D5, dur:0.5}, {freq:NOTE.F5, dur:0.5}, {freq:NOTE.A5, dur:0.5}, {freq:NOTE.G5, dur:0.5},
+      {freq:NOTE.E5, dur:0.5}, {freq:NOTE.C5, dur:0.5}, {freq:NOTE.D5, dur:0.5}, {freq:NOTE.E5, dur:1},
+      {freq:NOTE.G5, dur:0.5}, {freq:NOTE.E5, dur:0.5}, {freq:NOTE.C5, dur:0.5}, {freq:NOTE.D5, dur:0.5},
+      {freq:NOTE.E5, dur:0.5}, {freq:NOTE.G5, dur:0.5}, {freq:NOTE.A5, dur:0.5}, {freq:NOTE.G5, dur:0.5},
+      {freq:NOTE.E5, dur:0.5}, {freq:NOTE.D5, dur:0.5}, {freq:NOTE.C5, dur:0.5}, {freq:NOTE.E5, dur:0.5},
+      {freq:NOTE.G4, dur:0.5}, {freq:NOTE.A4, dur:0.5}, {freq:NOTE.C5, dur:1},   {freq:NOTE.R,  dur:0.5},
+    ]
+  },
+
+  // ② STAR LULLABY — gentle waltz, kids' bedtime feel, soft sine
+  {
+    name: '🌙 Star Lullaby',
+    bpm: 88,
+    vol: 0.055,
+    type: 'sine',
+    notes: [
+      {freq:NOTE.C5, dur:1},   {freq:NOTE.E5, dur:0.5}, {freq:NOTE.G5, dur:0.5},
+      {freq:NOTE.A5, dur:1},   {freq:NOTE.G5, dur:1},
+      {freq:NOTE.F5, dur:0.5}, {freq:NOTE.E5, dur:0.5}, {freq:NOTE.D5, dur:1},   {freq:NOTE.C5, dur:1},
+      {freq:NOTE.E5, dur:1},   {freq:NOTE.D5, dur:0.5}, {freq:NOTE.C5, dur:0.5},
+      {freq:NOTE.G4, dur:1},   {freq:NOTE.A4, dur:0.5}, {freq:NOTE.B4, dur:0.5}, {freq:NOTE.C5, dur:2},
+      {freq:NOTE.R,  dur:0.5},
+      {freq:NOTE.C5, dur:1},   {freq:NOTE.D5, dur:0.5}, {freq:NOTE.E5, dur:0.5},
+      {freq:NOTE.G5, dur:1},   {freq:NOTE.F5, dur:0.5}, {freq:NOTE.E5, dur:0.5},
+      {freq:NOTE.D5, dur:1},   {freq:NOTE.C5, dur:2},
+      {freq:NOTE.R,  dur:1},
+    ]
+  },
+
+  // ③ DISCO STAR — funky 70s kids disco, square wave
+  {
+    name: '🕺 Disco Star',
+    bpm: 124,
+    vol: 0.055,
+    type: 'square',
+    notes: [
+      {freq:NOTE.C5, dur:0.25, vol:1}, {freq:NOTE.R,  dur:0.25}, {freq:NOTE.E5, dur:0.25, vol:1}, {freq:NOTE.R,  dur:0.25},
+      {freq:NOTE.G5, dur:0.25, vol:1}, {freq:NOTE.R,  dur:0.25}, {freq:NOTE.E5, dur:0.25, vol:1}, {freq:NOTE.R,  dur:0.25},
+      {freq:NOTE.A5, dur:0.25, vol:1}, {freq:NOTE.G5, dur:0.25}, {freq:NOTE.E5, dur:0.25},         {freq:NOTE.D5, dur:0.25},
+      {freq:NOTE.C5, dur:0.5},         {freq:NOTE.R,  dur:0.25}, {freq:NOTE.C5, dur:0.25},
+      {freq:NOTE.D5, dur:0.25, vol:1}, {freq:NOTE.R,  dur:0.25}, {freq:NOTE.F5, dur:0.25, vol:1}, {freq:NOTE.R,  dur:0.25},
+      {freq:NOTE.A5, dur:0.25, vol:1}, {freq:NOTE.R,  dur:0.25}, {freq:NOTE.G5, dur:0.5},         {freq:NOTE.R,  dur:0.25},
+      {freq:NOTE.E5, dur:0.25},        {freq:NOTE.D5, dur:0.25}, {freq:NOTE.C5, dur:0.5},         {freq:NOTE.R,  dur:0.5},
+    ]
+  },
+
+  // ④ UNDERWATER WORLD — dreamy slow bubbles, sine + chorus feel
+  {
+    name: '🐠 Underwater World',
+    bpm: 70,
+    vol: 0.065,
+    type: 'sine',
+    notes: [
+      {freq:NOTE.C4, dur:2},   {freq:NOTE.G4, dur:1},   {freq:NOTE.E4, dur:1},
+      {freq:NOTE.A4, dur:2},   {freq:NOTE.F4, dur:1},   {freq:NOTE.D4, dur:1},
+      {freq:NOTE.B4, dur:1.5}, {freq:NOTE.G4, dur:0.5}, {freq:NOTE.E4, dur:2},
+      {freq:NOTE.C5, dur:1},   {freq:NOTE.A4, dur:1},   {freq:NOTE.G4, dur:1},   {freq:NOTE.E4, dur:1},
+      {freq:NOTE.F4, dur:2},   {freq:NOTE.A4, dur:1},   {freq:NOTE.C5, dur:1},
+      {freq:NOTE.D5, dur:2},   {freq:NOTE.B4, dur:1},   {freq:NOTE.G4, dur:1},
+      {freq:NOTE.E4, dur:2},   {freq:NOTE.C4, dur:2},
+      {freq:NOTE.R,  dur:1},
+    ]
+  },
+
+  // ⑤ HERO MARCH — triumphant kids-march with dotted rhythm, triangle
+  {
+    name: '🏆 Hero March',
+    bpm: 112,
+    vol: 0.07,
+    type: 'triangle',
+    notes: [
+      {freq:NOTE.C5, dur:0.75},{freq:NOTE.C5, dur:0.25},{freq:NOTE.C5, dur:0.5},{freq:NOTE.G4, dur:0.5},
+      {freq:NOTE.E5, dur:0.75},{freq:NOTE.E5, dur:0.25},{freq:NOTE.E5, dur:0.5},{freq:NOTE.C5, dur:0.5},
+      {freq:NOTE.G5, dur:0.75},{freq:NOTE.F5, dur:0.25},{freq:NOTE.E5, dur:0.5},{freq:NOTE.D5, dur:0.5},
+      {freq:NOTE.C5, dur:2},
+      {freq:NOTE.G4, dur:0.75},{freq:NOTE.G4, dur:0.25},{freq:NOTE.A4, dur:0.5},{freq:NOTE.B4, dur:0.5},
+      {freq:NOTE.C5, dur:0.75},{freq:NOTE.D5, dur:0.25},{freq:NOTE.E5, dur:0.5},{freq:NOTE.F5, dur:0.5},
+      {freq:NOTE.G5, dur:1},   {freq:NOTE.E5, dur:0.5},{freq:NOTE.C5, dur:0.5},
+      {freq:NOTE.G5, dur:2},
+    ]
+  },
+
+  // ⑥ RAINBOW SKIP — upbeat skippy tune, xylophone feel
+  {
+    name: '🌈 Rainbow Skip',
+    bpm: 148,
+    vol: 0.065,
+    type: 'triangle',
+    notes: [
+      {freq:NOTE.E5, dur:0.33},{freq:NOTE.G5, dur:0.33},{freq:NOTE.C6, dur:0.33},
+      {freq:NOTE.B5, dur:0.5}, {freq:NOTE.A5, dur:0.5},
+      {freq:NOTE.G5, dur:0.33},{freq:NOTE.E5, dur:0.33},{freq:NOTE.C5, dur:0.33},
+      {freq:NOTE.D5, dur:1},
+      {freq:NOTE.F5, dur:0.33},{freq:NOTE.A5, dur:0.33},{freq:NOTE.C6, dur:0.33},
+      {freq:NOTE.B5, dur:0.5}, {freq:NOTE.G5, dur:0.5},
+      {freq:NOTE.E5, dur:0.33},{freq:NOTE.D5, dur:0.33},{freq:NOTE.C5, dur:0.33},
+      {freq:NOTE.C5, dur:1.5}, {freq:NOTE.R,  dur:0.5},
+      {freq:NOTE.G5, dur:0.33},{freq:NOTE.A5, dur:0.33},{freq:NOTE.B5, dur:0.33},
+      {freq:NOTE.C6, dur:0.5}, {freq:NOTE.B5, dur:0.5},
+      {freq:NOTE.A5, dur:0.5}, {freq:NOTE.G5, dur:0.5},
+      {freq:NOTE.E5, dur:1},
+      {freq:NOTE.D5, dur:0.33},{freq:NOTE.E5, dur:0.33},{freq:NOTE.F5, dur:0.33},
+      {freq:NOTE.G5, dur:0.5}, {freq:NOTE.A5, dur:0.5},
+      {freq:NOTE.G5, dur:0.5}, {freq:NOTE.E5, dur:0.5},
+      {freq:NOTE.C5, dur:1},
+    ]
+  },
+
+];
+
+// ── Track management ──
+let activeScheduler = null;
+
+function stopCurrentTrack() {
+  if (activeScheduler) { activeScheduler.stop(); activeScheduler = null; }
+}
+
+function playTrack(idx) {
+  stopCurrentTrack();
+  if (!musicOn) return;
+  const t = TRACKS[idx];
+  const notes = t.notes.map(n => ({...n, type: t.type}));
+  activeScheduler = makeSequencer(notes, t.bpm, t.vol);
+  showTrackLabel(t.name);
+}
+
+function showTrackLabel(name) {
+  const el = document.getElementById('track-label');
+  el.textContent = name;
+  el.classList.remove('hidden');
+  clearTimeout(showTrackLabel._timer);
+  showTrackLabel._timer = setTimeout(() => el.classList.add('hidden'), 3500);
+}
+
+function nextTrack() {
+  currentTrackIdx = (currentTrackIdx + 1) % TRACKS.length;
+  if (musicOn) playTrack(currentTrackIdx);
+  else showTrackLabel(TRACKS[currentTrackIdx].name + ' (paused)');
+}
+
+function toggleMusic() {
+  musicOn = !musicOn;
+  const btn = document.getElementById('music-btn');
+  if (musicOn) {
+    btn.textContent = '🎵'; btn.classList.remove('muted');
+    getACtx(); playTrack(currentTrackIdx);
+  } else {
+    btn.textContent = '🔇'; btn.classList.add('muted');
+    stopCurrentTrack();
+  }
+}
+
+// Auto-start on first interaction
+document.addEventListener('click', () => {
+  if (!musicStarted && musicOn) { musicStarted = true; playTrack(currentTrackIdx); }
+}, { once: true });
+
+// ══════════════════════════════════════════
+//  SFX
+// ══════════════════════════════════════════
 function playCorrectSound() {
   try {
     const ctx = getACtx();
-    [523.25,659.25,783.99].forEach((freq,i)=>{
-      const o=ctx.createOscillator(), g=ctx.createGain();
-      o.connect(g); g.connect(ctx.destination); o.type='sine'; o.frequency.value=freq;
-      const t=ctx.currentTime+i*0.12;
-      g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.28,t+0.03); g.gain.exponentialRampToValueAtTime(0.001,t+0.28);
-      o.start(t); o.stop(t+0.3);
+    // Rising sparkle arpeggio
+    [[523.25, 0],[659.25, 0.1],[783.99, 0.2],[1046.5, 0.32],[1318.5, 0.42]].forEach(([freq, delay]) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'sine'; o.frequency.value = freq;
+      const t = ctx.currentTime + delay;
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.22, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+      o.start(t); o.stop(t + 0.32);
     });
-    const o2=ctx.createOscillator(), g2=ctx.createGain();
-    o2.connect(g2); g2.connect(ctx.destination); o2.type='sine'; o2.frequency.value=1318.5;
-    const t2=ctx.currentTime+0.35;
-    g2.gain.setValueAtTime(0.18,t2); g2.gain.exponentialRampToValueAtTime(0.001,t2+0.25);
-    o2.start(t2); o2.stop(t2+0.3);
-  } catch(e){}
+    // bonus shimmer
+    const o2 = ctx.createOscillator(), g2 = ctx.createGain();
+    o2.connect(g2); g2.connect(ctx.destination);
+    o2.type = 'triangle'; o2.frequency.value = 2093;
+    const t2 = ctx.currentTime + 0.5;
+    g2.gain.setValueAtTime(0.12, t2); g2.gain.exponentialRampToValueAtTime(0.001, t2 + 0.4);
+    o2.start(t2); o2.stop(t2 + 0.45);
+  } catch(e) {}
 }
+
 function playWrongSound() {
   try {
-    const ctx=getACtx(), o=ctx.createOscillator(), g=ctx.createGain();
-    o.connect(g); g.connect(ctx.destination); o.type='sawtooth';
-    o.frequency.setValueAtTime(220,ctx.currentTime); o.frequency.linearRampToValueAtTime(110,ctx.currentTime+0.35);
-    g.gain.setValueAtTime(0.22,ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.4);
-    o.start(ctx.currentTime); o.stop(ctx.currentTime+0.4);
-  } catch(e){}
+    const ctx = getACtx();
+    // Descending wobble
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(280, ctx.currentTime);
+    o.frequency.linearRampToValueAtTime(120, ctx.currentTime + 0.4);
+    g.gain.setValueAtTime(0.18, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.45);
+    o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.5);
+    // second thud
+    const o2 = ctx.createOscillator(), g2 = ctx.createGain();
+    o2.connect(g2); g2.connect(ctx.destination);
+    o2.type = 'square'; o2.frequency.value = 90;
+    const t2 = ctx.currentTime + 0.15;
+    g2.gain.setValueAtTime(0.1, t2); g2.gain.exponentialRampToValueAtTime(0.001, t2 + 0.25);
+    o2.start(t2); o2.stop(t2 + 0.28);
+  } catch(e) {}
 }
-function startMusic() {
-  if (melodyActive) return; melodyActive=true; melodyIdx=0;
-  const ctx=getACtx(); melodyGain=ctx.createGain(); melodyGain.gain.value=0.07; melodyGain.connect(ctx.destination);
-  scheduleMelNote(ctx);
+
+function playFanfare() {
+  // Played on game complete (perfect score)
+  try {
+    const ctx = getACtx();
+    const melody = [523.25, 659.25, 783.99, 659.25, 783.99, 1046.5];
+    melody.forEach((freq, i) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'triangle'; o.frequency.value = freq;
+      const t = ctx.currentTime + i * 0.13;
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.25, t + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+      o.start(t); o.stop(t + 0.32);
+    });
+  } catch(e) {}
 }
-function scheduleMelNote(ctx) {
-  if (!melodyActive) return;
-  const freq=MELODY[melodyIdx%MELODY.length]; melodyIdx++;
-  const o=ctx.createOscillator(), e=ctx.createGain();
-  o.connect(e); e.connect(melodyGain); o.type='triangle'; o.frequency.value=freq;
-  const t=ctx.currentTime;
-  e.gain.setValueAtTime(0,t); e.gain.linearRampToValueAtTime(1,t+0.04);
-  e.gain.setValueAtTime(1,t+MDUR*0.6); e.gain.linearRampToValueAtTime(0,t+MDUR*0.95);
-  o.start(t); o.stop(t+MDUR);
-  melodyTimeout=setTimeout(()=>scheduleMelNote(ctx), MDUR*1000);
-}
-function stopMusic() {
-  melodyActive=false; clearTimeout(melodyTimeout);
-  if (melodyGain) { try{melodyGain.disconnect();}catch(e){} melodyGain=null; }
-}
-function toggleMusic() {
-  musicOn=!musicOn;
-  const btn=document.getElementById('music-btn');
-  if (musicOn) { btn.textContent='🎵'; btn.classList.remove('muted'); startMusic(); }
-  else { btn.textContent='🔇'; btn.classList.add('muted'); stopMusic(); }
-}
-let musicStarted=false;
-document.addEventListener('click', ()=>{ if(!musicStarted&&musicOn){musicStarted=true;startMusic();} }, {once:true});
 
 // ══════════════════════════════════════════
 //  TRANSLATIONS
@@ -711,7 +930,6 @@ let wordLists = {
   en: JSON.parse(localStorage.getItem('words_en')||'["cat","dog","bird","sun","moon"]'),
   bm: JSON.parse(localStorage.getItem('words_bm')||'["kucing","anjing","burung","matahari","bulan"]')
 };
-// Mandarin character list: [{char, pinyin, meaning, strokes}]
 let zhChars = JSON.parse(localStorage.getItem('zh_chars')||JSON.stringify([
   {char:'生', pinyin:'shēng', meaning:'born/life', strokes:5},
   {char:'你', pinyin:'nǐ', meaning:'you', strokes:7},
@@ -725,13 +943,10 @@ let zhChars = JSON.parse(localStorage.getItem('zh_chars')||JSON.stringify([
   {char:'月', pinyin:'yuè', meaning:'moon/month', strokes:4},
 ]));
 
-// Spelling state
 let selectedWords=[], testWords=[], current=0, score=0;
 let answerWord='', missIdx=[], blankFills={}, fillPointer=0;
-// Math state
 let mathMin=1, mathMax=20, mathQCount=5, mathQType='both', mathDiff='easy';
 let mathQuestions=[], mathCurrent=0, mathScore=0, mathHardFillIdx=0, mathHardFilledAnswers=[];
-// Mandarin state
 let zhGameType='meaning', zhQCount=5;
 let zhSelectedChars=[], zhQuestions=[], zhCurrent=0, zhScore=0;
 
@@ -762,7 +977,6 @@ function applyTranslations() {
   if(me) me.innerHTML=`${d.mdiffEasy}<br><small>${d.mdiffEasySub}</small>`;
   if(mm) mm.innerHTML=`${d.mdiffMedium}<br><small>${d.mdiffMediumSub}</small>`;
   if(mh) mh.innerHTML=`${d.mdiffHard}<br><small>${d.mdiffHardSub}</small>`;
-  // Show/hide mandarin mode card
   const zhCard=document.getElementById('zh-mode-card');
   if(zhCard) zhCard.style.display = language==='zh' ? '' : 'none';
 }
@@ -783,21 +997,16 @@ function showSection(id) {
   document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
   document.getElementById(id+'-section').classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  if (id==='setup') { renderChips(); updateScanCardForLang(); }
+  if (id==='setup') renderChips();
   if (id==='zh-setup') { renderZhChips(); renderZhSelChips(); }
 }
 function goHome(){ showSection('home'); }
-
-function updateScanCardForLang() {
-  // In the EN/BM word list, the scan card targets that language
-  // (Mandarin has its own scan section in zh-setup)
-}
 
 // ══════════════════════════════════════════
 //  SPELLING WORD LIST
 // ══════════════════════════════════════════
 function renderChips() {
-  const lang = language==='zh' ? 'en' : language; // fallback en for zh in spelling
+  const lang = language==='zh' ? 'en' : language;
   const list = wordLists[lang]||wordLists['en'];
   document.getElementById('word-chips').innerHTML = list.map((w,i)=>
     `<span class="word-chip">${w}<button class="chip-del" onclick="removeWord(${i})">✕</button></span>`
@@ -893,7 +1102,6 @@ function startZhGame() {
     const card=pool[i%pool.length];
     let type=zhGameType;
     if(type==='mixed') type=gameTypes[Math.floor(Math.random()*3)];
-    // Strokes only if we have the data
     if(type==='strokes'&&!card.strokes) type='meaning';
     zhQuestions.push({card, type});
   }
@@ -908,27 +1116,19 @@ function nextZhQ() {
   document.getElementById('zh-counter').textContent=`${T('qLabel')} ${zhCurrent+1} ${T('of')} ${zhQuestions.length}`;
   document.getElementById('zh-score-live').textContent=`⭐ ${zhScore}`;
   document.getElementById('zh-progress').style.width=(zhCurrent/zhQuestions.length*100)+'%';
-
   const {card,type}=q;
-
-  // Type badge
   const badges={meaning:'👁️ Pick the meaning', pinyin:'🔉 Pick the character', strokes:'✏️ How many strokes?'};
   document.getElementById('zh-type-badge').textContent=badges[type]||'';
-
-  // Configure hero display
   const charEl=document.getElementById('zh-char-display');
   const pinEl=document.getElementById('zh-pinyin-display');
   const meanEl=document.getElementById('zh-meaning-display');
   const strokesBadge=document.getElementById('zh-strokes-badge');
-
   if(type==='meaning') {
-    // Show character + pinyin, pick meaning
     charEl.textContent=card.char; pinEl.textContent=card.pinyin; meanEl.textContent='';
     strokesBadge.style.display='none';
     document.getElementById('zh-q-label').textContent='What does this character mean?';
     renderZhMeaningChoices(card);
   } else if(type==='pinyin') {
-    // Show meaning + pinyin spoken, pick character
     charEl.textContent='?'; charEl.style.color='var(--muted)';
     pinEl.textContent=card.pinyin; meanEl.textContent='"'+card.meaning+'"';
     strokesBadge.style.display='none';
@@ -936,7 +1136,6 @@ function nextZhQ() {
     setTimeout(()=>speakZhChar(card.pinyin), 300);
     renderZhCharChoices(card);
   } else if(type==='strokes') {
-    // Show character + pinyin, pick stroke count
     charEl.textContent=card.char; charEl.style.color='var(--zh)';
     pinEl.textContent=card.pinyin; meanEl.textContent='"'+card.meaning+'"';
     strokesBadge.style.display='none';
@@ -953,7 +1152,6 @@ function renderZhMeaningChoices(card) {
     ${opts.map(m=>`<button class="zh-pin-btn" onclick="checkZhAnswer('${escapeSingle(m)}','${escapeSingle(card.meaning)}',this)">${m}</button>`).join('')}
   </div>`;
 }
-
 function renderZhCharChoices(card) {
   const all=zhChars.filter(c=>c.char!==card.char);
   const wrong=all.sort(()=>Math.random()-0.5).slice(0,3);
@@ -964,15 +1162,13 @@ function renderZhCharChoices(card) {
       <span class="zh-btn-pin">${c.pinyin}</span>
     </button>`).join('')}
   </div>`;
-  // Reset char color
   document.getElementById('zh-char-display').style.color='var(--muted)';
 }
-
 function renderZhStrokeChoices(card) {
   const correct=card.strokes;
   const opts=new Set([correct]);
   let tries=0;
-  while(opts.size<4&&tries<100){ tries++; const d=Math.floor(Math.random()*5)+1; const c=correct+[-3,-2,-1,1,2,3][Math.floor(Math.random()*6)]; if(c>0&&c!==correct)opts.add(c); }
+  while(opts.size<4&&tries<100){ tries++; const c=correct+[-3,-2,-1,1,2,3][Math.floor(Math.random()*6)]; if(c>0&&c!==correct)opts.add(c); }
   const arr=[...opts].sort(()=>Math.random()-0.5);
   document.getElementById('zh-choices').innerHTML=`<div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">
     ${arr.map(n=>`<button class="zh-stroke-btn" onclick="checkZhAnswer(${n},${correct},this)">${n}</button>`).join('')}
@@ -983,34 +1179,20 @@ function checkZhAnswer(chosen, correct, btn) {
   document.querySelectorAll('.zh-btn,.zh-pin-btn,.zh-stroke-btn').forEach(b=>b.disabled=true);
   const fb=document.getElementById('zh-feedback');
   const isCorrect = String(chosen)===String(correct);
-
-  // Reveal answer in hero if pinyin round
   const q=zhQuestions[zhCurrent];
-  if(q.type==='pinyin') {
-    const el=document.getElementById('zh-char-display');
-    el.textContent=q.card.char; el.style.color='var(--zh)';
-  }
-  if(q.type==='strokes') {
-    document.getElementById('zh-strokes-badge').textContent=`${correct} 笔画`;
-    document.getElementById('zh-strokes-badge').style.display='';
-  }
-  if(q.type==='meaning') {
-    document.getElementById('zh-meaning-display').textContent='"'+q.card.meaning+'"';
-  }
-
+  if(q.type==='pinyin') { const el=document.getElementById('zh-char-display'); el.textContent=q.card.char; el.style.color='var(--zh)'; }
+  if(q.type==='strokes') { document.getElementById('zh-strokes-badge').textContent=`${correct} 笔画`; document.getElementById('zh-strokes-badge').style.display=''; }
+  if(q.type==='meaning') { document.getElementById('zh-meaning-display').textContent='"'+q.card.meaning+'"'; }
   if(isCorrect) {
     zhScore++; btn.classList.add('correct-flash');
-    fb.textContent='⭐ 正确！'; fb.style.color='var(--grass)';
-    playCorrectSound();
+    fb.textContent='⭐ 正确！'; fb.style.color='var(--grass)'; playCorrectSound();
   } else {
     btn.classList.add('wrong-flash');
-    // Highlight correct
     document.querySelectorAll('.zh-btn,.zh-pin-btn,.zh-stroke-btn').forEach(b=>{
       const bval=b.querySelector('.zh-btn-char')?.textContent||b.textContent.trim();
       if(String(bval)===String(correct)) b.classList.add('correct-flash');
     });
-    fb.textContent=`❌ Answer: ${correct}`; fb.style.color='var(--coral)';
-    playWrongSound();
+    fb.textContent=`❌ Answer: ${correct}`; fb.style.color='var(--coral)'; playWrongSound();
   }
   zhCurrent++;
   document.getElementById('zh-next-btn').style.display='inline-flex';
@@ -1025,30 +1207,24 @@ function speakZhChar(pinyinOverride) {
   const u=new SpeechSynthesisUtterance(text);
   const voices=window.speechSynthesis.getVoices();
   const zhVoice=voices.find(v=>v.lang.includes('zh')||v.name.toLowerCase().includes('chinese')||v.name.toLowerCase().includes('mandarin'));
-  if(zhVoice){u.voice=zhVoice;}
-  u.lang='zh-CN'; u.rate=0.8;
+  if(zhVoice){u.voice=zhVoice;} u.lang='zh-CN'; u.rate=0.8;
   window.speechSynthesis.speak(u);
 }
-
 function escapeSingle(s){ return (s||'').replace(/'/g,"\\'"); }
 
 // ══════════════════════════════════════════
 //  MANDARIN IMAGE SCAN
 // ══════════════════════════════════════════
 let zhScanExtracted=[], zhScanExcluded=new Set();
-
 function zhScanDragOver(e){ e.preventDefault(); document.getElementById('zh-scan-drop').classList.add('drag-over'); }
-function zhScanDragLeave(e){ document.getElementById('zh-scan-drop').classList.remove('drag-over'); }
+function zhScanDragLeave(){ document.getElementById('zh-scan-drop').classList.remove('drag-over'); }
 function zhScanDrop(e){ e.preventDefault(); document.getElementById('zh-scan-drop').classList.remove('drag-over'); const f=e.dataTransfer.files[0]; if(f&&f.type.startsWith('image/')) zhProcessFile(f); }
 function zhScanFileSelected(e){ const f=e.target.files[0]; if(f) zhProcessFile(f); }
-
 function zhProcessFile(file) {
   const reader=new FileReader();
   reader.onload=(e)=>{
-    const prev=document.getElementById('zh-scan-preview');
-    prev.src=e.target.result; prev.style.display='block';
-    const base64=e.target.result.split(',')[1];
-    runZhScan(base64, file.type||'image/jpeg');
+    const prev=document.getElementById('zh-scan-preview'); prev.src=e.target.result; prev.style.display='block';
+    runZhScan(e.target.result.split(',')[1], file.type||'image/jpeg');
   };
   reader.readAsDataURL(file);
   zhScanExtracted=[]; zhScanExcluded=new Set();
@@ -1056,80 +1232,46 @@ function zhProcessFile(file) {
   document.getElementById('zh-scan-actions').style.display='none';
   zhSetStatus('loading','🔍 AI is reading the characters...');
 }
-
 async function runZhScan(base64Data, mediaType) {
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1500,
-        messages:[{
-          role:'user',
-          content:[
-            { type:'image', source:{type:'base64', media_type:mediaType, data:base64Data} },
-            { type:'text', text:`You are a Chinese language teacher assistant. Look at this image of a child's Chinese (Mandarin) worksheet or textbook page.
-
-Extract all the Chinese characters (汉字) that are being taught or featured. For each unique character, provide:
-1. The character itself
-2. Its pinyin (with tone marks, e.g. shēng not sheng1)
-3. Its English meaning (short, child-friendly, e.g. "born" not "to give birth to")
-4. Stroke count (integer number of strokes)
-
-Rules:
-- Only include characters explicitly taught/labeled on the page (look for numbered items, labels, stroke order boxes)
-- No duplicate characters
-- Maximum 20 characters
-- If stroke count is shown in the image, use that exact number
-
-Reply ONLY with valid JSON, nothing else:
-{"characters": [{"char":"生","pinyin":"shēng","meaning":"born","strokes":5}]}`
-            }
-          ]
-        }]
-      })
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1500,
+        messages:[{role:'user',content:[
+          {type:'image',source:{type:'base64',media_type:mediaType,data:base64Data}},
+          {type:'text',text:`You are a Chinese language teacher assistant. Extract all Chinese characters (汉字) taught or featured in this worksheet. For each, provide char, pinyin (with tone marks), meaning (short, child-friendly), stroke count. Max 20 chars. Reply ONLY valid JSON: {"characters":[{"char":"生","pinyin":"shēng","meaning":"born","strokes":5}]}`}
+        ]}]})
     });
-    if(!response.ok){ const e=await response.json().catch(()=>({})); throw new Error(e.error?.message||`API error ${response.status}`); }
+    if(!response.ok){const e=await response.json().catch(()=>({}));throw new Error(e.error?.message||`API error ${response.status}`);}
     const data=await response.json();
     const text=data.content.map(b=>b.text||'').join('');
-    const clean=text.replace(/```json|```/g,'').trim();
-    const parsed=JSON.parse(clean);
+    const parsed=JSON.parse(text.replace(/```json|```/g,'').trim());
     const chars=(parsed.characters||[]).filter(c=>c.char&&c.pinyin&&c.meaning);
-    if(chars.length===0){ zhSetStatus('error','😕 No characters found. Try a clearer photo of the worksheet.'); return; }
+    if(chars.length===0){zhSetStatus('error','😕 No characters found. Try a clearer photo.');return;}
     zhScanExtracted=chars;
     zhSetStatus('success',`✅ Found ${chars.length} character${chars.length>1?'s':''}! Tap any to remove.`);
-    renderZhScanChips();
-    document.getElementById('zh-scan-actions').style.display='flex';
-  } catch(err) {
-    console.error(err);
-    zhSetStatus('error',`❌ Scan failed: ${err.message}`);
-  }
+    renderZhScanChips(); document.getElementById('zh-scan-actions').style.display='flex';
+  } catch(err){ zhSetStatus('error',`❌ Scan failed: ${err.message}`); }
 }
-
-function renderZhScanChips() {
+function renderZhScanChips(){
   document.getElementById('zh-scan-word-preview').innerHTML=zhScanExtracted.map((c,i)=>{
     const excl=zhScanExcluded.has(i)?'excluded':'';
     return `<span class="scan-zh-chip ${excl}" onclick="toggleZhScanChip(${i})">
-      <span class="c">${c.char}</span>
-      <span class="p">${c.pinyin}</span>
-      <span class="m">${c.meaning}${c.strokes?' · '+c.strokes+'画':''}</span>
-    </span>`;
+      <span class="c">${c.char}</span><span class="p">${c.pinyin}</span>
+      <span class="m">${c.meaning}${c.strokes?' · '+c.strokes+'画':''}</span></span>`;
   }).join('');
 }
-function toggleZhScanChip(i){ if(zhScanExcluded.has(i))zhScanExcluded.delete(i);else zhScanExcluded.add(i); renderZhScanChips(); }
-function zhScanAddChars() {
-  const toAdd=zhScanExtracted.filter((_,i)=>!zhScanExcluded.has(i));
-  let added=0;
-  toAdd.forEach(c=>{ if(!zhChars.some(x=>x.char===c.char)){ zhChars.push(c); added++; } });
+function toggleZhScanChip(i){if(zhScanExcluded.has(i))zhScanExcluded.delete(i);else zhScanExcluded.add(i);renderZhScanChips();}
+function zhScanAddChars(){
+  const toAdd=zhScanExtracted.filter((_,i)=>!zhScanExcluded.has(i)); let added=0;
+  toAdd.forEach(c=>{if(!zhChars.some(x=>x.char===c.char)){zhChars.push(c);added++;}});
   saveZhChars(); renderZhChips(); renderZhSelChips();
   zhSetStatus('success',`🎉 Added ${added} character${added!==1?'s':''}!`);
   document.getElementById('zh-scan-actions').style.display='none';
   document.getElementById('zh-scan-word-preview').innerHTML='';
-  zhSelectedChars=[...zhChars]; renderZhSelChips();
-  playCorrectSound();
+  zhSelectedChars=[...zhChars]; renderZhSelChips(); playCorrectSound();
 }
-function zhScanReset() {
+function zhScanReset(){
   document.getElementById('zh-scan-preview').style.display='none';
   document.getElementById('zh-scan-word-preview').innerHTML='';
   document.getElementById('zh-scan-actions').style.display='none';
@@ -1137,7 +1279,7 @@ function zhScanReset() {
   document.getElementById('zh-scan-input').value='';
   zhScanExtracted=[]; zhScanExcluded=new Set();
 }
-function zhSetStatus(type,msg){ const el=document.getElementById('zh-scan-status'); el.className='scan-status '+type; el.textContent=msg; }
+function zhSetStatus(type,msg){const el=document.getElementById('zh-scan-status');el.className='scan-status '+type;el.textContent=msg;}
 
 // ══════════════════════════════════════════
 //  SPELLING LOBBY
@@ -1244,16 +1386,14 @@ function generateMathQuestions() {
     const lo=mathMin, hi=mathMax-(seqLen-1);
     if(hi<lo){
       const s=lo+Math.floor(Math.random()*(mathMax-lo));
-      const seq=[s,s+1];
-      let blanks,answers;
+      const seq=[s,s+1]; let blanks,answers;
       if(type==='hard'){blanks=[0,1];answers=[seq[0],seq[1]];}
       else if(type==='next'){blanks=[1];answers=[seq[1]];}
       else{blanks=[0];answers=[seq[0]];}
       mathQuestions.push({type,sequence:seq,blanks,answers,answer:answers[0]});
     } else {
       const s=lo+Math.floor(Math.random()*(hi-lo+1));
-      const seq=Array.from({length:seqLen},(_,i)=>s+i);
-      let blanks,answers;
+      const seq=Array.from({length:seqLen},(_,i)=>s+i); let blanks,answers;
       if(type==='hard'){blanks=[0,seqLen-1];answers=[seq[0],seq[seqLen-1]];}
       else if(mathDiff==='medium'){const bp=1+Math.floor(Math.random()*(seqLen-2));blanks=[bp];answers=[seq[bp]];}
       else if(type==='next'){blanks=[seqLen-1];answers=[seq[seqLen-1]];}
@@ -1276,8 +1416,7 @@ function nextMathQ(){
   document.getElementById('math-q-label').textContent=q.type==='hard'?'🧠 Fill in the missing numbers!':q.type==='next'||mathDiff==='easy'?T('nextLabel'):q.type==='before'?T('beforeLabel'):'🤔 Fill in the missing number!';
   document.getElementById('math-sequence').innerHTML=q.sequence.map((n,i)=>{
     const isBlank=q.blanks.includes(i);
-    const box=isBlank?`<div class="num-box num-blank" id="math-blank-${i}">?</div>`:`<div class="num-box num-known">${n}</div>`;
-    return box+(i<q.sequence.length-1?`<div class="num-sep">,</div>`:'');
+    return (isBlank?`<div class="num-box num-blank" id="math-blank-${i}">?</div>`:`<div class="num-box num-known">${n}</div>`)+(i<q.sequence.length-1?`<div class="num-sep">,</div>`:'');
   }).join('');
   renderMathChoices(q,0);
 }
@@ -1310,56 +1449,6 @@ function generateDistractors(answer,count){
 }
 
 // ══════════════════════════════════════════
-//  SPELLING IMAGE SCAN (EN/BM)
-// ══════════════════════════════════════════
-let scanExcluded=new Set(), scanExtractedWords=[];
-function scanDragOver(e){e.preventDefault();document.getElementById('scan-drop-zone').classList.add('drag-over');}
-function scanDragLeave(){document.getElementById('scan-drop-zone').classList.remove('drag-over');}
-function scanDrop(e){e.preventDefault();document.getElementById('scan-drop-zone').classList.remove('drag-over');const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))processImageFile(f);}
-function scanFileSelected(e){const f=e.target.files[0];if(f)processImageFile(f);}
-function processImageFile(file){
-  const reader=new FileReader();
-  reader.onload=(e)=>{
-    const prev=document.getElementById('scan-preview'); prev.src=e.target.result; prev.style.display='block';
-    runImageScan(e.target.result.split(',')[1], file.type||'image/jpeg');
-  };
-  reader.readAsDataURL(file);
-  scanExtractedWords=[]; scanExcluded=new Set();
-  document.getElementById('scan-word-preview').innerHTML='';
-  document.getElementById('scan-actions').style.display='none';
-  setStatus('loading','🔍 Scanning image for words...');
-}
-async function runImageScan(base64Data,mediaType){
-  try{
-    const langHint=language==='bm'?'Focus on Bahasa Malaysia (Malay) words.':'Focus on English words.';
-    const response=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:mediaType,data:base64Data}},{type:'text',text:`You are a word extractor for a children's spelling game. ${langHint}\nExtract readable words good for spelling practice (ages 4-10). Rules: real words only, 2-14 letters, lowercase, no duplicates, exclude: a an the is are was were I to of in it be do at by or as. Aim 5-20 words.\nReply ONLY JSON: {"words":["word1","word2"]}`}]}]})});
-    if(!response.ok){const e=await response.json().catch(()=>({}));throw new Error(e.error?.message||`API error ${response.status}`);}
-    const data=await response.json();
-    const text=data.content.map(b=>b.text||'').join('');
-    const parsed=JSON.parse(text.replace(/```json|```/g,'').trim());
-    const words=(parsed.words||[]).map(w=>w.toLowerCase().trim()).filter(w=>w.length>=2&&w.length<=14&&/^[a-zA-ZÀ-ÿ]+$/.test(w));
-    if(words.length===0){setStatus('error','😕 No words found. Try a clearer image.');return;}
-    scanExtractedWords=words;
-    setStatus('success',`✅ Found ${words.length} word${words.length>1?'s':''}! Tap any to remove.`);
-    renderScanWords(); document.getElementById('scan-actions').style.display='flex';
-  }catch(err){setStatus('error',`❌ Scan failed: ${err.message}`);}
-}
-function renderScanWords(){document.getElementById('scan-word-preview').innerHTML=scanExtractedWords.map((w,i)=>`<span class="scan-word-chip ${scanExcluded.has(i)?'excluded':''}" onclick="toggleScanWord(${i})">${w}</span>`).join('');}
-function toggleScanWord(i){if(scanExcluded.has(i))scanExcluded.delete(i);else scanExcluded.add(i);renderScanWords();}
-function scanAddWords(){
-  const lang=language==='zh'?'en':language;
-  const toAdd=scanExtractedWords.filter((_,i)=>!scanExcluded.has(i)); let added=0;
-  toAdd.forEach(w=>{if(!wordLists[lang].includes(w)){wordLists[lang].push(w);added++;}});
-  saveWords(); renderChips();
-  setStatus('success',`🎉 Added ${added} new word${added!==1?'s':''}!`);
-  document.getElementById('scan-actions').style.display='none';
-  document.getElementById('scan-word-preview').innerHTML='';
-  playCorrectSound();
-}
-function scanReset(){document.getElementById('scan-preview').style.display='none';document.getElementById('scan-word-preview').innerHTML='';document.getElementById('scan-actions').style.display='none';document.getElementById('scan-status').style.display='none';document.getElementById('scan-file-input').value='';scanExtractedWords=[];scanExcluded=new Set();}
-function setStatus(type,msg){const el=document.getElementById('scan-status');el.className='scan-status '+type;el.textContent=msg;}
-
-// ══════════════════════════════════════════
 //  COMPLETE
 // ══════════════════════════════════════════
 function showComplete(mode){
@@ -1369,7 +1458,7 @@ function showComplete(mode){
   document.getElementById('final-score').textContent=`${s} ${T('of')} ${total}`;
   const pct=total>0?s/total:0;
   document.getElementById('final-msg').textContent=pct===1?T('perfect'):pct>=0.7?T('wellDone'):T('goodTry');
-  if(pct===1)playCorrectSound();
+  if(pct===1) playFanfare(); else if(pct>=0.7) playCorrectSound();
 }
 function playAgain(){
   if(lastMode==='spell'){selectedWords=[...(wordLists[language==='zh'?'en':language]||[])];confirmSpellStart();}
