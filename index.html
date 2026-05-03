@@ -145,6 +145,49 @@
   .spell-bar { background: linear-gradient(90deg, var(--sky), var(--purple)); }
   .math-bar  { background: linear-gradient(90deg, var(--orange), var(--sun)); }
 
+  /* ── Image scan ── */
+  .scan-drop-zone {
+    border: 3px dashed #b8d8f0; border-radius: 16px; padding: 28px 16px;
+    text-align: center; cursor: pointer; transition: 0.2s; background: #f6fbff;
+    position: relative; margin: 14px 0;
+  }
+  .scan-drop-zone:hover, .scan-drop-zone.drag-over {
+    border-color: var(--sky); background: #e8f5ff;
+    transform: scale(1.01);
+  }
+  .scan-drop-zone input[type=file] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+  .scan-icon { font-size: 2.4rem; display: block; margin-bottom: 8px; }
+  .scan-label { font-weight: bold; color: var(--sky); font-size: 1rem; }
+  .scan-sub { color: var(--muted); font-size: 0.8rem; margin-top: 4px; }
+
+  .scan-preview {
+    width: 100%; max-height: 180px; object-fit: cover; border-radius: 12px;
+    margin: 10px 0; display: none; border: 2px solid #d0e8f8;
+  }
+
+  .scan-status {
+    padding: 10px 16px; border-radius: 10px; font-weight: bold; font-size: 0.9rem;
+    margin: 8px 0; display: none; text-align: center;
+  }
+  .scan-status.loading { background: #fff8e8; color: var(--orange); display: block; }
+  .scan-status.success { background: #e8fff0; color: var(--grass); display: block; }
+  .scan-status.error   { background: #fff0f0; color: var(--coral); display: block; }
+
+  .scan-word-preview {
+    display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; justify-content: center;
+  }
+  .scan-word-chip {
+    background: #f0f8ff; border: 2px solid var(--sky); border-radius: 50px;
+    padding: 4px 14px; font-weight: bold; font-size: 0.9rem; color: var(--text);
+    cursor: pointer; transition: 0.15s; font-family: inherit;
+  }
+  .scan-word-chip:hover { background: #ffeef0; border-color: var(--coral); text-decoration: line-through; }
+  .scan-word-chip.excluded { background: #fff0f0; border-color: #f5c6c6; color: #ccc; text-decoration: line-through; }
+
+  .scan-actions { display: flex; gap: 8px; justify-content: center; margin-top: 10px; flex-wrap: wrap; }
+
   section { display: none; }
   section.active { display: block; }
 </style>
@@ -229,6 +272,28 @@
       <div style="margin-top:12px;display:flex;gap:8px;">
         <button class="btn btn-danger btn-sm" onclick="clearWords()" id="ui-clear-btn">🗑️ Clear All</button>
         <button class="btn btn-outline btn-sm" onclick="goHome()" id="ui-back-btn2">🏠 Back</button>
+      </div>
+    </div>
+
+    <!-- IMAGE SCAN CARD -->
+    <div class="card">
+      <div class="card-title" style="color:var(--purple);">📷 Scan Image for Words</div>
+      <p style="text-align:center;color:var(--muted);font-size:0.88rem;margin-bottom:4px;">
+        Upload a photo of a worksheet, book page, or word list — AI will extract the words!
+      </p>
+      <div class="scan-drop-zone" id="scan-drop-zone"
+        ondragover="scanDragOver(event)" ondragleave="scanDragLeave(event)" ondrop="scanDrop(event)">
+        <input type="file" id="scan-file-input" accept="image/*" onchange="scanFileSelected(event)">
+        <span class="scan-icon">🖼️</span>
+        <div class="scan-label">Tap to upload image</div>
+        <div class="scan-sub">or drag &amp; drop · JPG, PNG, HEIC</div>
+      </div>
+      <img id="scan-preview" class="scan-preview" alt="preview">
+      <div class="scan-status" id="scan-status"></div>
+      <div class="scan-word-preview" id="scan-word-preview"></div>
+      <div class="scan-actions" id="scan-actions" style="display:none;">
+        <button class="btn btn-sm btn-outline" onclick="scanReset()">🔄 Scan Again</button>
+        <button class="btn btn-success" onclick="scanAddWords()" style="font-size:1rem;padding:10px 22px;">➕ Add to Word List</button>
       </div>
     </div>
   </section>
@@ -1062,6 +1127,167 @@ function playAgain() {
   } else {
     startMathGame();
   }
+}
+
+// ══════════════════════════════════════════
+//  IMAGE SCAN (Claude Vision)
+// ══════════════════════════════════════════
+let scanExcluded = new Set();
+let scanExtractedWords = [];
+
+function scanDragOver(e) {
+  e.preventDefault();
+  document.getElementById('scan-drop-zone').classList.add('drag-over');
+}
+function scanDragLeave(e) {
+  document.getElementById('scan-drop-zone').classList.remove('drag-over');
+}
+function scanDrop(e) {
+  e.preventDefault();
+  document.getElementById('scan-drop-zone').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) processImageFile(file);
+}
+function scanFileSelected(e) {
+  const file = e.target.files[0];
+  if (file) processImageFile(file);
+}
+
+function processImageFile(file) {
+  // Show preview
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const preview = document.getElementById('scan-preview');
+    preview.src = e.target.result;
+    preview.style.display = 'block';
+    // Kick off API call with base64
+    const base64 = e.target.result.split(',')[1];
+    const mediaType = file.type || 'image/jpeg';
+    runImageScan(base64, mediaType);
+  };
+  reader.readAsDataURL(file);
+  // Reset previous results
+  scanExtractedWords = [];
+  scanExcluded = new Set();
+  document.getElementById('scan-word-preview').innerHTML = '';
+  document.getElementById('scan-actions').style.display = 'none';
+  setStatus('loading', '🔍 Scanning image for words...');
+}
+
+async function runImageScan(base64Data, mediaType) {
+  try {
+    const langHint = language === 'bm'
+      ? 'Focus on Bahasa Malaysia (Malay) words.'
+      : 'Focus on English words.';
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: [
+            {
+              type: 'image',
+              source: { type: 'base64', media_type: mediaType, data: base64Data }
+            },
+            {
+              type: 'text',
+              text: `You are a word extractor for a children's spelling game. ${langHint}
+
+Look at this image and extract ALL readable words that would be good spelling practice words for children (ages 4-10). 
+
+Rules:
+- Only real dictionary words (no abbreviations, numbers, or symbols)
+- Minimum 2 letters, maximum 14 letters
+- Lowercase only
+- No duplicates
+- Exclude common function words like: a, an, the, is, are, was, were, I, to, of, in, it, be, do, at, by, or, as
+- Aim for 5-20 good spelling words
+
+Reply ONLY with a JSON object in this exact format, nothing else:
+{"words": ["word1", "word2", "word3"]}`
+            }
+          ]
+        }]
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error?.message || `API error ${response.status}`);
+    }
+
+    const data = await response.json();
+    const text = data.content.map(b => b.text || '').join('');
+    const clean = text.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+    const words = (parsed.words || [])
+      .map(w => w.toLowerCase().trim())
+      .filter(w => w.length >= 2 && w.length <= 14 && /^[a-zA-ZÀ-ÿ]+$/.test(w));
+
+    if (words.length === 0) {
+      setStatus('error', '😕 No words found. Try a clearer image with readable text.');
+      return;
+    }
+
+    scanExtractedWords = words;
+    setStatus('success', `✅ Found ${words.length} word${words.length > 1 ? 's' : ''}! Tap any word to remove it.`);
+    renderScanWords();
+    document.getElementById('scan-actions').style.display = 'flex';
+
+  } catch (err) {
+    console.error('Scan error:', err);
+    setStatus('error', `❌ Scan failed: ${err.message}. Please try again.`);
+  }
+}
+
+function renderScanWords() {
+  document.getElementById('scan-word-preview').innerHTML = scanExtractedWords.map((w, i) => {
+    const excl = scanExcluded.has(i) ? 'excluded' : '';
+    return `<span class="scan-word-chip ${excl}" onclick="toggleScanWord(${i})" title="Tap to remove">${w}</span>`;
+  }).join('');
+}
+
+function toggleScanWord(i) {
+  if (scanExcluded.has(i)) scanExcluded.delete(i);
+  else scanExcluded.add(i);
+  renderScanWords();
+}
+
+function scanAddWords() {
+  const toAdd = scanExtractedWords.filter((_, i) => !scanExcluded.has(i));
+  let added = 0;
+  toAdd.forEach(w => {
+    if (!wordLists[language].includes(w)) {
+      wordLists[language].push(w);
+      added++;
+    }
+  });
+  save();
+  renderChips();
+  setStatus('success', `🎉 Added ${added} new word${added !== 1 ? 's' : ''} to your list!`);
+  document.getElementById('scan-actions').style.display = 'none';
+  document.getElementById('scan-word-preview').innerHTML = '';
+  playCorrectSound();
+}
+
+function scanReset() {
+  document.getElementById('scan-preview').style.display = 'none';
+  document.getElementById('scan-word-preview').innerHTML = '';
+  document.getElementById('scan-actions').style.display = 'none';
+  document.getElementById('scan-status').style.display = 'none';
+  document.getElementById('scan-file-input').value = '';
+  scanExtractedWords = [];
+  scanExcluded = new Set();
+}
+
+function setStatus(type, msg) {
+  const el = document.getElementById('scan-status');
+  el.className = 'scan-status ' + type;
+  el.textContent = msg;
 }
 
 // ══════════════════════════════════════════
