@@ -3,31 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SpellStar ⭐ Kids Spelling Game</title>
+<title>SpellStar ⭐ Kids Learning Game</title>
 <style>
   :root {
     --sky: #38b2f5; --sun: #ffd93d; --grass: #6bcb77; --coral: #ff6b6b; --purple: #c77dff;
+    --orange: #ff9f43;
     --bg: #e8f7ff; --card: #ffffff; --text: #2d3a4a; --muted: #7a92a8;
     --radius: 20px; --shadow: 0 8px 32px rgba(56,178,245,0.13), 0 2px 8px rgba(0,0,0,0.07);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
   body {
     font-family: 'Comic Sans MS', 'Chalkboard SE', 'OpenDyslexic', sans-serif;
     letter-spacing: 1.5px; word-spacing: 4px; background: var(--bg);
     min-height: 100vh; overflow-x: hidden; color: var(--text);
   }
-
   .blob-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
   .blob { position: absolute; border-radius: 50%; opacity: 0.18; filter: blur(60px); animation: blobMove 12s ease-in-out infinite alternate; }
   .blob-1 { width: 400px; height: 400px; background: var(--sky); top: -100px; left: -80px; }
   .blob-2 { width: 350px; height: 350px; background: var(--sun); top: 40%; right: -80px; animation-delay: 3s; }
   .blob-3 { width: 300px; height: 300px; background: var(--grass); bottom: -80px; left: 20%; animation-delay: 6s; }
   .blob-4 { width: 250px; height: 250px; background: var(--coral); top: 20%; left: 50%; animation-delay: 9s; }
-  @keyframes blobMove { from { transform: translate(0,0) scale(1); } to { transform: translate(30px, 20px) scale(1.1); } }
+  @keyframes blobMove { from { transform: translate(0,0) scale(1); } to { transform: translate(30px,20px) scale(1.1); } }
 
   .container { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; padding: 20px 16px 60px; }
-
   .header { text-align: center; padding: 24px 0 18px; }
   .header h1 { font-size: 3rem; color: var(--sky); font-weight: bold; text-shadow: 3px 3px 0 #fff, 5px 5px 0 rgba(56,178,245,0.2); }
 
@@ -35,8 +33,8 @@
   .lang-tab { padding: 8px 24px; border-radius: 50px; border: 2.5px solid var(--sky); font-weight: bold; font-family: inherit; cursor: pointer; background: transparent; color: var(--sky); transition: 0.2s; }
   .lang-tab.active { background: var(--sky); color: #fff; box-shadow: 0 4px 16px rgba(56,178,245,0.35); }
 
-  .nav-strip { display: flex; justify-content: center; gap: 6px; margin-bottom: 20px; flex-wrap: wrap;}
-  .nav-btn { padding: 8px 18px; border-radius: 50px; border: 2.5px solid transparent; font-family: inherit; font-weight: bold; cursor: pointer; background: #fff; color: var(--muted); transition: 0.2s;}
+  .nav-strip { display: flex; justify-content: center; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+  .nav-btn { padding: 8px 18px; border-radius: 50px; border: 2.5px solid transparent; font-family: inherit; font-weight: bold; cursor: pointer; background: #fff; color: var(--muted); transition: 0.2s; }
   .nav-btn.active { border-color: var(--sky); color: var(--sky); background: #f0f8ff; }
 
   .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; margin-bottom: 16px; animation: slideUp 0.4s ease; }
@@ -46,46 +44,94 @@
   .btn { padding: 10px 18px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; font-family: inherit; transition: 0.18s; display: inline-flex; align-items: center; gap: 6px; justify-content: center; }
   .btn-primary { background: var(--sky); color: #fff; }
   .btn-success { background: var(--grass); color: #fff; }
-  .btn-danger { background: var(--coral); color: #fff; }
+  .btn-danger  { background: var(--coral); color: #fff; }
+  .btn-warning { background: var(--orange); color: #fff; }
   .btn-outline { background: transparent; border: 2px solid var(--sky); color: var(--sky); }
   .btn-sm { padding: 6px 12px; font-size: 0.85rem; border-radius: 8px; }
 
+  /* ── Mode cards on Home ── */
+  .mode-row { display: flex; gap: 14px; justify-content: center; margin-top: 24px; flex-wrap: wrap; }
+  .mode-card { flex: 1; min-width: 130px; max-width: 180px; padding: 22px 12px; border-radius: 18px; border: 3px solid transparent; cursor: pointer; text-align: center; font-family: inherit; font-weight: bold; font-size: 1rem; transition: 0.2s; background: #f0f8ff; color: var(--text); }
+  .mode-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+  .mode-card.spell { border-color: var(--sky); }
+  .mode-card.math  { border-color: var(--orange); }
+  .mode-card .mode-icon { font-size: 2.8rem; display: block; margin-bottom: 8px; }
+
+  /* ── Spelling ── */
   .difficulty-row { display: flex; gap: 8px; margin: 15px 0; flex-wrap: wrap; justify-content: center; }
-  .diff-btn { padding: 8px 20px; border-radius: 50px; border: 2.5px solid #d0e8f8; font-weight: bold; cursor: pointer; background: #f4faff; color: var(--muted); }
+  .diff-btn { padding: 8px 20px; border-radius: 50px; border: 2.5px solid #d0e8f8; font-weight: bold; cursor: pointer; background: #f4faff; color: var(--muted); font-family: inherit; }
   .diff-btn.active { border-color: var(--purple); color: var(--purple); background: #f6eeff; }
 
   .word-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; justify-content: center; }
-  .word-chip { background: #f8f9fa; border: 2px solid #e2e8f0; border-radius: 50px; padding: 6px 16px; font-weight: bold; cursor: pointer; transition: 0.2s; color: var(--muted); }
+  .word-chip { background: #f8f9fa; border: 2px solid #e2e8f0; border-radius: 50px; padding: 6px 16px; font-weight: bold; cursor: pointer; transition: 0.2s; color: var(--muted); font-family: inherit; }
   .word-chip.selected { background: #e8fff0; border-color: var(--grass); color: var(--text); transform: translateY(-2px); }
   .chip-del { background: none; border: none; color: var(--coral); font-weight: bold; margin-left: 8px; cursor: pointer; }
 
-  .word-display { text-align: center; padding: 28px 16px; background: linear-gradient(135deg, #f0f8ff 0%, #faf4ff 100%); border-radius: 18px; margin-bottom: 18px; border: 2.5px solid #e0efff; }
+  .word-display { text-align: center; padding: 28px 16px; background: linear-gradient(135deg,#f0f8ff 0%,#faf4ff 100%); border-radius: 18px; margin-bottom: 18px; border: 2.5px solid #e0efff; }
   .word-letters { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px; }
   .letter-box { width: 48px; height: 56px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; }
   .letter-known { background: #e8f5ff; color: var(--text); border: 2px solid #c8e0f0; }
   .letter-blank { border: 3px dashed #aaa; background: #fff; }
   .letter-blank.filled { border: 3px solid var(--grass); background: #f0fff4; }
-  .letter-blank.wrong-fill { border-color: var(--coral); background: #fff0f0; animation: shake 0.4s; }
-
+  .letter-blank.next-up { border: 3px solid var(--sun); background: #fffbe8; box-shadow: 0 0 0 4px rgba(255,217,61,0.35); animation: pulse 1s ease-in-out infinite alternate; }
+  @keyframes pulse { from { box-shadow: 0 0 0 3px rgba(255,217,61,0.3); } to { box-shadow: 0 0 0 7px rgba(255,217,61,0.0); } }
   @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
 
-  .letter-choices { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; justify-content: center;}
-  .letter-btn { width: 54px; height: 54px; border-radius: 12px; border: none; font-weight: bold; font-size: 1.6rem; cursor: pointer; background: #fff; box-shadow: 0 4px 0 rgba(0,0,0,0.1); }
-  
+  .letter-choices { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; justify-content: center; }
+  .letter-btn { width: 54px; height: 54px; border-radius: 12px; border: none; font-weight: bold; font-size: 1.6rem; cursor: pointer; background: #fff; box-shadow: 0 4px 0 rgba(0,0,0,0.1); transition: 0.15s; font-family: inherit; }
+  .letter-btn.locked { opacity: 0.35; cursor: not-allowed; }
+  .choices-group { margin-bottom: 12px; }
+  .choices-label { text-align: center; font-size: 0.8rem; color: var(--muted); margin-bottom: 4px; }
+
+  /* ── Math ── */
+  .math-display { text-align: center; padding: 28px 16px; background: linear-gradient(135deg,#fff8ee 0%,#fff0fb 100%); border-radius: 18px; margin-bottom: 18px; border: 2.5px solid #ffe5c0; }
+  .math-sequence { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px; }
+  .num-box { min-width: 58px; height: 66px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; padding: 0 8px; }
+  .num-known { background: #fff3e0; color: var(--text); border: 2px solid #ffd9a0; }
+  .num-blank { border: 3px dashed #ffb347; background: #fff; color: var(--orange); font-size: 1.4rem; animation: pulse-orange 1s ease-in-out infinite alternate; }
+  .num-blank.filled { border: 3px solid var(--grass); background: #f0fff4; color: var(--text); animation: none; }
+  @keyframes pulse-orange { from { box-shadow: 0 0 0 3px rgba(255,159,67,0.25); } to { box-shadow: 0 0 0 8px rgba(255,159,67,0.0); } }
+  .num-sep { font-size: 1.6rem; color: var(--muted); font-weight: bold; line-height: 1; }
+
+  .math-choices { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 16px; }
+  .num-btn { min-width: 68px; height: 62px; border-radius: 14px; border: none; font-weight: bold; font-size: 1.5rem; cursor: pointer; background: #fff; box-shadow: 0 4px 0 rgba(0,0,0,0.1); transition: 0.15s; font-family: inherit; padding: 0 10px; }
+  .num-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 0 rgba(0,0,0,0.1); }
+  .num-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .num-btn.correct-flash { background: #d4f5d4; border: 2px solid var(--grass); }
+  .num-btn.wrong-flash   { background: #ffd4d4; border: 2px solid var(--coral); }
+
+  .math-q-label { font-size: 1rem; color: var(--orange); font-weight: bold; text-align: center; margin-bottom: 10px; }
+
+  /* Range & settings */
+  .range-row { display: flex; align-items: center; gap: 10px; justify-content: center; margin: 14px 0; flex-wrap: wrap; }
+  .range-input { width: 85px; padding: 10px; border-radius: 10px; border: 2.5px solid #ffd9a0; font-size: 1.2rem; font-family: inherit; font-weight: bold; text-align: center; background: #fffbf5; color: var(--text); }
+  .range-input:focus { outline: none; border-color: var(--orange); }
+  .range-label { font-weight: bold; color: var(--muted); }
+
+  .q-count-row { display: flex; gap: 8px; justify-content: center; margin: 10px 0; flex-wrap: wrap; }
+  .qc-btn { padding: 8px 20px; border-radius: 50px; border: 2.5px solid #ffd9a0; font-weight: bold; cursor: pointer; background: #fff8ee; color: var(--muted); font-family: inherit; transition: 0.2s; }
+  .qc-btn.active { border-color: var(--orange); color: var(--orange); background: #fff3e0; }
+
+  /* Progress bar */
+  .progress-bar-wrap { background: #e8e8e8; border-radius: 50px; height: 10px; margin-bottom: 12px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; border-radius: 50px; transition: width 0.4s; }
+  .spell-bar { background: linear-gradient(90deg, var(--sky), var(--purple)); }
+  .math-bar  { background: linear-gradient(90deg, var(--orange), var(--sun)); }
+
   section { display: none; }
   section.active { display: block; }
 </style>
 </head>
 <body>
-
 <div class="blob-bg">
-  <div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div><div class="blob blob-4"></div>
+  <div class="blob blob-1"></div><div class="blob blob-2"></div>
+  <div class="blob blob-3"></div><div class="blob blob-4"></div>
 </div>
 
 <div class="container">
   <div class="header">
     <h1>⭐ SpellStar</h1>
-    <p class="tagline" id="ui-tagline">The fun spelling adventure for kids!</p>
+    <p>The fun learning adventure for kids!</p>
   </div>
 
   <div class="lang-tabs">
@@ -94,89 +140,183 @@
   </div>
 
   <div class="nav-strip">
-    <button class="nav-btn active" onclick="showSection('home')" id="ui-nav-home">🏠 Home</button>
-    <button class="nav-btn" onclick="showSection('rewards')" id="ui-nav-rewards">🎁 Rewards</button>
-    <button class="nav-btn" onclick="showSection('history')" id="ui-nav-history">🏆 History</button>
+    <button class="nav-btn active" onclick="goHome()" id="ui-nav-home">🏠 Home</button>
+    <button class="nav-btn" onclick="showSection('rewards')">🎁 Rewards</button>
+    <button class="nav-btn" onclick="showSection('history')">🏆 History</button>
     <button class="nav-btn" onclick="showSection('setup')" id="ui-nav-words">🔒 Words</button>
   </div>
 
+  <!-- HOME -->
   <section id="home-section" class="active">
-    <div class="card" style="text-align:center; padding: 40px 20px;">
-        <h2 id="ui-home-welcome">Welcome!</h2>
-        <button class="btn btn-success" onclick="startTestLobby()" style="font-size:1.8rem; padding:20px 40px; margin-top:20px;">🚀 PLAY NOW!</button>
+    <div class="card" style="text-align:center; padding:36px 20px;">
+      <h2 id="ui-home-welcome">Welcome!</h2>
+      <p style="color:var(--muted); margin-top:8px;">Choose your game:</p>
+      <div class="mode-row">
+        <button class="mode-card spell" onclick="startSpellLobby()">
+          <span class="mode-icon">📝</span>Spelling
+        </button>
+        <button class="mode-card math" onclick="showSection('math-setup')">
+          <span class="mode-icon">🔢</span>Numbers
+        </button>
+      </div>
     </div>
   </section>
 
+  <!-- SPELLING LOBBY -->
   <section id="selection-section">
     <div class="card">
-      <div class="card-title" id="ui-sel-title">Game Settings</div>
-      
+      <div class="card-title">📝 Spelling Settings</div>
       <p style="text-align:center; font-weight:bold; color:var(--muted);" id="ui-diff-label">DIFFICULTY:</p>
       <div class="difficulty-row">
-        <button class="diff-btn active" id="diff-easy" onclick="setDiff('easy')">😊 Easy</button>
-        <button class="diff-btn" id="diff-medium" onclick="setDiff('medium')">🤔 Medium</button>
-        <button class="diff-btn" id="diff-hard" onclick="setDiff('hard')">😤 Hard</button>
+        <button class="diff-btn active" id="diff-easy"   onclick="setDiff('easy')">😊 Easy</button>
+        <button class="diff-btn"        id="diff-medium" onclick="setDiff('medium')">🤔 Medium</button>
+        <button class="diff-btn"        id="diff-hard"   onclick="setDiff('hard')">😤 Hard</button>
       </div>
-
-      <hr style="border:none; border-top:2px dashed #eee; margin:20px 0;">
-      
+      <hr style="border:none;border-top:2px dashed #eee;margin:20px 0;">
       <p style="text-align:center; font-weight:bold; color:var(--muted);" id="ui-sel-words-label">PICK WORDS:</p>
-      <div style="display:flex; gap:8px; justify-content:center; margin-bottom:10px;">
+      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:10px;">
         <button class="btn btn-sm btn-outline" onclick="selectAllSel()">Select All</button>
         <button class="btn btn-sm btn-outline" onclick="deselectAllSel()">None</button>
       </div>
       <div class="word-chips" id="selection-chips"></div>
-
-      <div style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
-         <button class="btn btn-outline" onclick="goHome()">🏠 Back</button>
-         <button class="btn btn-success" onclick="confirmStart()" style="font-size:1.2rem; padding: 12px 30px;">Go! 🚀</button>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:20px;">
+        <button class="btn btn-outline" onclick="goHome()">🏠 Back</button>
+        <button class="btn btn-success" onclick="confirmSpellStart()" style="font-size:1.2rem;padding:12px 30px;">Go! 🚀</button>
       </div>
     </div>
   </section>
 
+  <!-- WORD LIST (parent) -->
   <section id="setup-section">
     <div class="card">
-      <div class="card-title" id="lang-title">📖 My Word List</div>
-      <div style="display:flex; gap:8px; margin-bottom:15px;">
-        <input type="text" id="word-input" placeholder="Type here..." style="flex:1; padding:12px; border-radius:10px; border:2px solid #ddd;">
+      <div class="card-title">📖 My Word List</div>
+      <div style="display:flex;gap:8px;margin-bottom:15px;">
+        <input type="text" id="word-input" placeholder="Type here..."
+          style="flex:1;padding:12px;border-radius:10px;border:2px solid #ddd;font-family:inherit;">
         <button class="btn btn-primary" onclick="addWord()">➕ Add</button>
       </div>
       <div class="word-chips" id="word-chips"></div>
-      <button class="btn btn-danger btn-sm" onclick="clearWords()">🗑️ Clear All</button>
+      <div style="margin-top:12px;display:flex;gap:8px;">
+        <button class="btn btn-danger btn-sm" onclick="clearWords()">🗑️ Clear All</button>
+        <button class="btn btn-outline btn-sm" onclick="goHome()">🏠 Back</button>
+      </div>
     </div>
   </section>
 
+  <!-- MATH SETUP -->
+  <section id="math-setup-section">
+    <div class="card">
+      <div class="card-title" style="color:var(--orange);">🔢 Number Settings</div>
+
+      <p style="text-align:center;font-weight:bold;color:var(--muted);margin-bottom:4px;">NUMBER RANGE:</p>
+      <div class="range-row">
+        <input class="range-input" type="number" id="math-min" value="1" min="0" max="9999">
+        <span class="range-label">to</span>
+        <input class="range-input" type="number" id="math-max" value="20" min="1" max="9999">
+      </div>
+      <p style="text-align:center;font-size:0.82rem;color:var(--muted);">Questions will use numbers within this range.</p>
+
+      <hr style="border:none;border-top:2px dashed #eee;margin:18px 0;">
+      <p style="text-align:center;font-weight:bold;color:var(--muted);margin-bottom:8px;">HOW MANY QUESTIONS?</p>
+      <div class="q-count-row">
+        <button class="qc-btn active" id="qc-5"  onclick="setQCount(5)">5</button>
+        <button class="qc-btn"        id="qc-10" onclick="setQCount(10)">10</button>
+        <button class="qc-btn"        id="qc-15" onclick="setQCount(15)">15</button>
+        <button class="qc-btn"        id="qc-20" onclick="setQCount(20)">20</button>
+      </div>
+
+      <hr style="border:none;border-top:2px dashed #eee;margin:18px 0;">
+      <p style="text-align:center;font-weight:bold;color:var(--muted);margin-bottom:8px;">QUESTION TYPE:</p>
+      <div class="q-count-row">
+        <button class="qc-btn active" id="qt-both"   onclick="setQType('both')">🔀 Both</button>
+        <button class="qc-btn"        id="qt-next"   onclick="setQType('next')">➡️ Next only</button>
+        <button class="qc-btn"        id="qt-before" onclick="setQType('before')">⬅️ Before only</button>
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:22px;">
+        <button class="btn btn-outline" onclick="goHome()">🏠 Back</button>
+        <button class="btn btn-warning" onclick="startMathGame()" style="font-size:1.2rem;padding:12px 30px;">Go! 🚀</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPELLING TEST -->
   <section id="test-section">
     <div class="card">
-      <div style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:10px;">
+      <div class="progress-bar-wrap"><div class="progress-bar-fill spell-bar" id="spell-progress" style="width:0%"></div></div>
+      <div style="display:flex;justify-content:space-between;font-weight:bold;margin-bottom:10px;">
         <span id="word-counter"></span>
-        <div id="timer-display" style="color:var(--coral);"></div>
+        <span id="spell-score-live" style="color:var(--grass);"></span>
       </div>
       <div class="word-display"><div class="word-letters" id="word-letters"></div></div>
       <div id="choices-area"></div>
-      <div id="feedback-area" style="text-align:center; font-weight:bold; height:30px; margin-top:10px;"></div>
-      <div style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
+      <div id="feedback-area" style="text-align:center;font-weight:bold;height:30px;margin-top:10px;"></div>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:20px;">
         <button class="btn btn-primary" onclick="speakWord()">🔊 Hear</button>
         <button class="btn btn-success" id="next-btn" onclick="nextWord()" style="display:none;">Next ➡️</button>
       </div>
     </div>
   </section>
 
-  <section id="complete-section"><div class="card" style="text-align:center;"><h2>🎉 Great Job!</h2><h3 id="final-score"></h3><button class="btn btn-primary" onclick="goHome()">🏠 Home</button></div></section>
+  <!-- MATH TEST -->
+  <section id="math-section">
+    <div class="card">
+      <div class="progress-bar-wrap"><div class="progress-bar-fill math-bar" id="math-progress" style="width:0%"></div></div>
+      <div style="display:flex;justify-content:space-between;font-weight:bold;margin-bottom:10px;">
+        <span id="math-counter"></span>
+        <span id="math-score-live" style="color:var(--orange);"></span>
+      </div>
+      <div class="math-q-label" id="math-q-label"></div>
+      <div class="math-display">
+        <div class="math-sequence" id="math-sequence"></div>
+      </div>
+      <div class="math-choices" id="math-choices"></div>
+      <div id="math-feedback" style="text-align:center;font-weight:bold;height:30px;margin-top:10px;"></div>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:20px;">
+        <button class="btn btn-warning" id="math-next-btn" onclick="nextMathQ()" style="display:none;">Next ➡️</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPLETE -->
+  <section id="complete-section">
+    <div class="card" style="text-align:center;padding:36px 20px;">
+      <div style="font-size:3rem;">🎉</div>
+      <h2 style="margin:12px 0 6px;">Great Job!</h2>
+      <h3 id="final-score" style="color:var(--sky);"></h3>
+      <p id="final-msg" style="color:var(--muted);margin-top:8px;"></p>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:20px;">
+        <button class="btn btn-primary" onclick="goHome()">🏠 Home</button>
+        <button class="btn btn-success" onclick="playAgain()">🔄 Again</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stubs -->
+  <section id="rewards-section"><div class="card" style="text-align:center;"><h2>🎁 Rewards coming soon!</h2><button class="btn btn-outline" style="margin-top:16px;" onclick="goHome()">🏠 Back</button></div></section>
+  <section id="history-section"><div class="card" style="text-align:center;"><h2>🏆 History coming soon!</h2><button class="btn btn-outline" style="margin-top:16px;" onclick="goHome()">🏠 Back</button></div></section>
 </div>
 
 <script>
-let language = 'en', difficulty = 'easy', isParentUnlocked = false;
+// ── Shared ──
+let language = 'en', difficulty = 'easy', isParentUnlocked = false, lastMode = 'spell';
+
+// ── Spelling state ──
 let wordLists = {
   en: JSON.parse(localStorage.getItem('words_en') || '["cat","dog","bird","sun","moon"]'),
   bm: JSON.parse(localStorage.getItem('words_bm') || '["kucing","anjing","burung","matahari","bulan"]')
 };
 let selectedWords = [], testWords = [], current = 0, score = 0;
-let answerWord = '', missIdx = [], blankFills = {};
+let answerWord = '', missIdx = [], blankFills = {}, fillPointer = 0;
 
+// ── Math state ──
+let mathMin = 1, mathMax = 20, mathQCount = 5, mathQType = 'both';
+let mathQuestions = [], mathCurrent = 0, mathScore = 0;
+
+// ── UI text ──
 const DICT = {
-  en: { welcome: "Welcome!", diffLabel: "DIFFICULTY:", selWords: "PICK WORDS:", navHome: "🏠 Home", navWords: "🔒 Words" },
-  bm: { welcome: "Selamat Datang!", diffLabel: "TAHAP:", selWords: "PILIH PERKATAAN:", navHome: "🏠 Utama", navWords: "🔒 Kata" }
+  en: { welcome:"Welcome!", diffLabel:"DIFFICULTY:", selWords:"PICK WORDS:", navHome:"🏠 Home", navWords:"🔒 Words" },
+  bm: { welcome:"Selamat Datang!", diffLabel:"TAHAP:", selWords:"PILIH PERKATAAN:", navHome:"🏠 Utama", navWords:"🔒 Kata" }
 };
 
 function switchLang(lang) {
@@ -191,152 +331,304 @@ function switchLang(lang) {
   renderChips();
 }
 
-function renderChips() {
-  const wrap = document.getElementById('word-chips');
-  wrap.innerHTML = wordLists[language].map((w, i) => `<span class="word-chip">${w}<button class="chip-del" onclick="removeWord(${i})">✕</button></span>`).join('');
+// ── Nav ──
+function showSection(id) {
+  if (id === 'setup' && !isParentUnlocked) {
+    const p = prompt("Password (UNLOCK):");
+    if (p !== 'UNLOCK') return;
+    isParentUnlocked = true;
+  }
+  document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id + '-section').classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
 }
+function goHome() { showSection('home'); }
 
+// ── Word list ──
+function renderChips() {
+  document.getElementById('word-chips').innerHTML = wordLists[language].map((w,i) =>
+    `<span class="word-chip">${w}<button class="chip-del" onclick="removeWord(${i})">✕</button></span>`
+  ).join('');
+}
 function addWord() {
   const inp = document.getElementById('word-input');
   const val = inp.value.trim().toLowerCase();
-  if(val && !wordLists[language].includes(val)) { wordLists[language].push(val); save(); renderChips(); inp.value=''; }
+  if (val.length < 2) { if(val) alert("Word must be at least 2 letters!"); return; }
+  if (!wordLists[language].includes(val)) { wordLists[language].push(val); save(); renderChips(); inp.value=''; }
 }
 function removeWord(i) { wordLists[language].splice(i,1); save(); renderChips(); }
 function save() { localStorage.setItem('words_'+language, JSON.stringify(wordLists[language])); }
+function clearWords() { if(confirm("Clear all words?")) { wordLists[language]=[]; save(); renderChips(); } }
 
-function setDiff(d) {
-  difficulty = d;
-  document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('diff-'+d).classList.add('active');
-}
-
-function startTestLobby() {
-  if(wordLists[language].length === 0) return alert("Add words first!");
+// ── Spelling lobby ──
+function startSpellLobby() {
+  if (wordLists[language].length===0) return alert("Add words first in 🔒 Words!");
   selectedWords = [...wordLists[language]];
-  showSection('selection');
-  renderLobby();
+  showSection('selection'); renderLobby();
 }
-
 function renderLobby() {
-  const wrap = document.getElementById('selection-chips');
-  wrap.innerHTML = wordLists[language].map(w => {
+  document.getElementById('selection-chips').innerHTML = wordLists[language].map(w => {
     const sel = selectedWords.includes(w) ? 'selected' : '';
     return `<span class="word-chip ${sel}" onclick="toggleSel('${w}')">${w}</span>`;
   }).join('');
 }
-
 function toggleSel(w) {
-  if(selectedWords.includes(w)) selectedWords = selectedWords.filter(x => x!==w);
-  else selectedWords.push(w);
+  if(selectedWords.includes(w)) selectedWords=selectedWords.filter(x=>x!==w); else selectedWords.push(w);
   renderLobby();
 }
-
-function selectAllSel() { selectedWords = [...wordLists[language]]; renderLobby(); }
-function deselectAllSel() { selectedWords = []; renderLobby(); }
-
-function confirmStart() {
-  if(selectedWords.length === 0) return alert("Select at least one word!");
-  // TRUE SHUFFLE
-  testWords = [...selectedWords].sort(() => Math.random() - 0.5);
-  current = 0; score = 0;
-  showSection('test');
-  nextWord();
+function selectAllSel() { selectedWords=[...wordLists[language]]; renderLobby(); }
+function deselectAllSel() { selectedWords=[]; renderLobby(); }
+function setDiff(d) {
+  difficulty=d;
+  document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('diff-'+d).classList.add('active');
+}
+function confirmSpellStart() {
+  if(selectedWords.length===0) return alert("Select at least one word!");
+  testWords=[...selectedWords].sort(()=>Math.random()-0.5);
+  current=0; score=0; lastMode='spell';
+  showSection('test'); nextWord();
 }
 
+// ── Spelling game ──
 function nextWord() {
-  if(current >= testWords.length) return showComplete();
-  answerWord = testWords[current];
-  blankFills = {}; missIdx = [];
-  document.getElementById('next-btn').style.display = 'none';
-  document.getElementById('feedback-area').textContent = '';
-  document.getElementById('word-counter').textContent = `Word ${current+1} / ${testWords.length}`;
-  
-  const bCount = difficulty === 'easy' ? 1 : difficulty === 'medium' ? 2 : 3;
-  let pos = []; for(let i=1; i<answerWord.length; i++) pos.push(i);
-  missIdx = pos.sort(() => Math.random()-0.5).slice(0, Math.min(bCount, pos.length));
+  if(current>=testWords.length) return showComplete('spell');
+  answerWord=testWords[current]; blankFills={}; missIdx=[]; fillPointer=0;
+  document.getElementById('next-btn').style.display='none';
+  document.getElementById('feedback-area').textContent='';
+  document.getElementById('word-counter').textContent=`Word ${current+1} / ${testWords.length}`;
+  document.getElementById('spell-score-live').textContent=`⭐ ${score}`;
+  document.getElementById('spell-progress').style.width=(current/testWords.length*100)+'%';
 
-  renderTestUI();
-  speakWord();
+  const bCount=difficulty==='easy'?1:difficulty==='medium'?2:3;
+  let pos=[]; for(let i=1;i<answerWord.length;i++) pos.push(i);
+  missIdx=pos.sort(()=>Math.random()-0.5).slice(0,Math.min(bCount,pos.length)).sort((a,b)=>a-b);
+  renderSpellUI(); speakWord();
 }
 
-function renderTestUI() {
-  document.getElementById('word-letters').innerHTML = answerWord.split('').map((c, i) => 
-    missIdx.includes(i) ? `<div class="letter-box letter-blank" id="blank-${i}">?</div>` : `<div class="letter-box letter-known">${c}</div>`
+function renderSpellUI() {
+  document.getElementById('word-letters').innerHTML=answerWord.split('').map((c,i)=>
+    missIdx.includes(i)
+      ?`<div class="letter-box letter-blank${i===missIdx[0]?' next-up':''}" id="blank-${i}">?</div>`
+      :`<div class="letter-box letter-known">${c}</div>`
   ).join('');
-
-  document.getElementById('choices-area').innerHTML = missIdx.map(idx => {
-    const correct = answerWord[idx];
-    const opts = [correct, ...("abcdefghijklmnopqrstuvwxyz".split('').filter(x=>x!==correct).sort(()=>Math.random()-0.5).slice(0,2))].sort();
-    return `<div class="letter-choices">${opts.map(o => `<button class="letter-btn" onclick="fill(${idx},'${o}',this)">${o}</button>`).join('')}</div>`;
+  document.getElementById('choices-area').innerHTML=missIdx.map((idx,gi)=>{
+    const correct=answerWord[idx];
+    const opts=[correct,...("abcdefghijklmnopqrstuvwxyz".split('').filter(x=>x!==correct).sort(()=>Math.random()-0.5).slice(0,2))].sort(()=>Math.random()-0.5);
+    const locked=gi!==0;
+    return `<div class="choices-group" id="group-${idx}">
+      <div class="choices-label">Fill blank ${gi+1}</div>
+      <div class="letter-choices">${opts.map(o=>`<button class="letter-btn${locked?' locked':''}" onclick="fill(${idx},'${o}',this,${gi})" data-group="${gi}">${o}</button>`).join('')}</div></div>`;
   }).join('');
 }
 
-function fill(idx, char, btn) {
-  if(blankFills[idx]) return;
-  blankFills[idx] = char;
-  const box = document.getElementById('blank-'+idx);
-  box.textContent = char; box.classList.add('filled');
-  btn.style.opacity = '0.4';
-  if(Object.keys(blankFills).length === missIdx.length) check();
-}
-
-function check() {
-  const win = missIdx.every(idx => blankFills[idx] === answerWord[idx]);
-  const fb = document.getElementById('feedback-area');
-  if(win) { score++; fb.textContent = "⭐ Great!"; fb.style.color = "var(--grass)"; }
-  else { fb.textContent = "❌ No, it was " + answerWord; fb.style.color = "var(--coral)"; }
-  current++; document.getElementById('next-btn').style.display = 'inline-flex';
-}
-
-// MALAYSIA VOICE FIX
-function speakWord() {
-  if (!window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
-  
-  const u = new SpeechSynthesisUtterance(answerWord);
-  const voices = window.speechSynthesis.getVoices();
-  
-  if (language === 'bm') {
-    // Cari ms-MY secara spesifik
-    const malayVoice = voices.find(v => v.lang.includes('ms-MY') || v.lang.includes('ms_MY') || v.name.toLowerCase().includes('malay'));
-    if (malayVoice) {
-      u.voice = malayVoice;
-      u.lang = 'ms-MY';
-    } else {
-      // Fallback ke Indonesia jika tiada Malaysia (bunyi hampir sama)
-      const idVoice = voices.find(v => v.lang.startsWith('id'));
-      if (idVoice) u.voice = idVoice;
-      u.lang = 'ms-MY';
-    }
-  } else {
-    u.lang = 'en-US';
+function fill(idx, char, btn, gi) {
+  if(gi!==fillPointer||blankFills[idx]!==undefined) return;
+  blankFills[idx]=char;
+  const box=document.getElementById('blank-'+idx);
+  box.textContent=char; box.classList.remove('next-up'); box.classList.add('filled');
+  document.querySelectorAll(`[data-group="${gi}"]`).forEach(b=>{b.style.opacity='0.4';b.style.cursor='default';});
+  fillPointer++;
+  if(fillPointer<missIdx.length){
+    document.getElementById('blank-'+missIdx[fillPointer])?.classList.add('next-up');
+    document.querySelectorAll(`[data-group="${fillPointer}"]`).forEach(b=>b.classList.remove('locked'));
   }
-  
-  u.rate = 0.8;
-  u.pitch = 1.0;
+  if(fillPointer===missIdx.length) checkSpell();
+}
+
+function checkSpell() {
+  const win=missIdx.every(i=>blankFills[i]===answerWord[i]);
+  const fb=document.getElementById('feedback-area');
+  if(win){score++;fb.textContent="⭐ Great!";fb.style.color="var(--grass)";}
+  else{fb.textContent="❌ It was: "+answerWord;fb.style.color="var(--coral)";}
+  current++; document.getElementById('next-btn').style.display='inline-flex';
+}
+
+function speakWord() {
+  // FIX 6: Guard so this only runs when spelling test is active
+  if(!window.speechSynthesis) return;
+  if(!answerWord) return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(answerWord);
+  const voices=window.speechSynthesis.getVoices();
+  if(language==='bm'){
+    const mv=voices.find(v=>v.lang.includes('ms-MY')||v.lang.includes('ms_MY')||v.name.toLowerCase().includes('malay'));
+    if(mv){u.voice=mv;u.lang='ms-MY';}
+    else{const iv=voices.find(v=>v.lang.startsWith('id'));if(iv)u.voice=iv;u.lang='ms-MY';}
+  } else{u.lang='en-US';}
+  u.rate=0.8;u.pitch=1.0;
   window.speechSynthesis.speak(u);
 }
 
-function showSection(id) {
-  if(id === 'setup' && !isParentUnlocked) {
-    const p = prompt("Password (UNLOCK):");
-    if(p !== 'UNLOCK') return;
-    isParentUnlocked = true;
-  }
-  document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
-  document.getElementById(id+'-section').classList.add('active');
+// ── Math settings ──
+function setQCount(n) {
+  mathQCount=n;
+  document.querySelectorAll('.qc-btn[id^="qc-"]').forEach(b=>b.classList.remove('active'));
+  document.getElementById('qc-'+n).classList.add('active');
+}
+function setQType(t) {
+  mathQType=t;
+  document.querySelectorAll('.qc-btn[id^="qt-"]').forEach(b=>b.classList.remove('active'));
+  document.getElementById('qt-'+t).classList.add('active');
 }
 
-function showComplete() { showSection('complete'); document.getElementById('final-score').textContent = `${score} / ${testWords.length}`; }
-function goHome() { showSection('home'); }
-function clearWords() { if(confirm("Clear?")) { wordLists[language]=[]; save(); renderChips(); } }
-function quitGame() { if(confirm("Quit?")) goHome(); }
+// ── Math generate ──
+function generateMathQuestions() {
+  const minN=parseInt(document.getElementById('math-min').value)||1;
+  const maxN=parseInt(document.getElementById('math-max').value)||20;
+  mathMin=Math.min(minN,maxN);
+  mathMax=Math.max(minN,maxN);
 
-// Pre-load voices
-window.speechSynthesis.onvoiceschanged = () => {
-  window.speechSynthesis.getVoices();
-};
+  // FIX 5: If user typed range backwards, swap the displayed values so UI matches game
+  if(minN>maxN){
+    document.getElementById('math-min').value=mathMin;
+    document.getElementById('math-max').value=mathMax;
+  }
 
+  if(mathMax-mathMin<3){alert("Please set a range of at least 4 numbers apart (e.g. 1 to 10).");return false;}
+
+  mathQuestions=[];
+  const seqLen=4; // show 4 numbers, 1 is blank
+
+  for(let q=0;q<mathQCount;q++){
+    let type;
+    if(mathQType==='both') type=Math.random()<0.5?'next':'before';
+    else if(mathQType==='next') type='next';
+    else type='before';
+
+    // startNum = the FIRST number in the 4-number sequence
+    // sequence = [startNum, startNum+1, startNum+2, startNum+3]
+    // For 'next':   blank is last  → answer = startNum+3
+    // For 'before': blank is first → answer = startNum
+    // Constraint: entire sequence must be within [mathMin, mathMax]
+    const lo=mathMin, hi=mathMax-(seqLen-1);
+    if(hi<lo){
+      // Range too small for seqLen=4, fall back to seqLen=2
+      const startNum=lo+Math.floor(Math.random()*(mathMax-lo));
+      const seq=[startNum,startNum+1];
+      const blankPos=type==='next'?1:0;
+      mathQuestions.push({type,sequence:seq,blankPos,answer:seq[blankPos]});
+    } else {
+      const startNum=lo+Math.floor(Math.random()*(hi-lo+1));
+      const seq=[];
+      for(let i=0;i<seqLen;i++) seq.push(startNum+i);
+      const blankPos=type==='next'?seqLen-1:0;
+      mathQuestions.push({type,sequence:seq,blankPos,answer:seq[blankPos]});
+    }
+  }
+  return true;
+}
+
+// ── Math game ──
+function startMathGame() {
+  if(!generateMathQuestions()) return;
+  mathCurrent=0; mathScore=0; lastMode='math';
+  showSection('math'); nextMathQ();
+}
+
+function nextMathQ() {
+  if(mathCurrent>=mathQuestions.length) return showComplete('math');
+  const q=mathQuestions[mathCurrent];
+
+  document.getElementById('math-next-btn').style.display='none';
+  document.getElementById('math-feedback').textContent='';
+  document.getElementById('math-counter').textContent=`Q ${mathCurrent+1} / ${mathQuestions.length}`;
+  document.getElementById('math-score-live').textContent=`⭐ ${mathScore}`;
+  document.getElementById('math-progress').style.width=(mathCurrent/mathQuestions.length*100)+'%';
+
+  document.getElementById('math-q-label').textContent=
+    q.type==='next' ? "What number comes NEXT? ➡️" : "What number comes BEFORE? ⬅️";
+
+  // Render sequence with commas between
+  document.getElementById('math-sequence').innerHTML=q.sequence.map((n,i)=>{
+    const isBlank=i===q.blankPos;
+    const box=isBlank
+      ?`<div class="num-box num-blank" id="math-blank">?</div>`
+      :`<div class="num-box num-known">${n}</div>`;
+    const comma=i<q.sequence.length-1?`<div class="num-sep">,</div>`:'';
+    return box+comma;
+  }).join('');
+
+  // Choices: answer + 3 distractors
+  const answer=q.answer;
+  const distractors=generateDistractors(answer,3);
+  const opts=[answer,...distractors].sort(()=>Math.random()-0.5);
+
+  document.getElementById('math-choices').innerHTML=opts.map(n=>
+    `<button class="num-btn" onclick="pickMathAnswer(${n},${answer},this)">${n}</button>`
+  ).join('');
+}
+
+function generateDistractors(answer, count) {
+  // FIX 3: Clamp distractors to non-negative numbers, avoid negatives confusing kids
+  const pool=new Set();
+  const candidates=[];
+  for(let d=-6;d<=6;d++){
+    const c=answer+d;
+    // Keep distractor non-negative and not equal to answer
+    if(c!==answer && c>=0) candidates.push(c);
+  }
+  candidates.sort(()=>Math.random()-0.5);
+  for(const c of candidates){ if(pool.size>=count) break; pool.add(c); }
+  // Fallback: random numbers from range (non-negative, not answer)
+  let tries=0;
+  while(pool.size<count&&tries<100){
+    tries++;
+    const lo=Math.max(0,mathMin);
+    const c=lo+Math.floor(Math.random()*(mathMax-lo+1));
+    if(c!==answer) pool.add(c);
+  }
+  return [...pool].slice(0,count);
+}
+
+function pickMathAnswer(chosen, answer, btn) {
+  document.querySelectorAll('.num-btn').forEach(b=>b.disabled=true);
+  const blank=document.getElementById('math-blank');
+  const fb=document.getElementById('math-feedback');
+
+  // FIX 1+2: Always show the CORRECT answer in the blank immediately — no wrong-number flash
+  blank.textContent=answer;
+  blank.classList.add('filled');
+
+  if(chosen===answer){
+    mathScore++;
+    btn.classList.add('correct-flash');
+    fb.textContent="⭐ Correct!"; fb.style.color="var(--grass)";
+  } else {
+    btn.classList.add('wrong-flash');
+    fb.textContent=`❌ It was ${answer}`; fb.style.color="var(--coral)";
+    // Highlight the correct button green so kid can see which one was right
+    document.querySelectorAll('.num-btn').forEach(b=>{
+      if(Number(b.textContent)===answer) b.classList.add('correct-flash');
+    });
+  }
+  mathCurrent++;
+  document.getElementById('math-next-btn').style.display='inline-flex';
+}
+
+// ── Complete ──
+function showComplete(mode) {
+  const total=mode==='spell'?testWords.length:mathQuestions.length;
+  const s=mode==='spell'?score:mathScore;
+  showSection('complete');
+  document.getElementById('final-score').textContent=`${s} / ${total}`;
+  const pct=total>0?s/total:0;
+  document.getElementById('final-msg').textContent=
+    pct===1?"🌟 Perfect score! Amazing!":pct>=0.7?"😊 Well done! Keep it up!":"💪 Good try! Practice makes perfect!";
+}
+
+function playAgain() {
+  if(lastMode==='spell'){
+    // FIX 4: Re-read word list so any changes since last game are picked up
+    selectedWords=[...wordLists[language]];
+    confirmSpellStart();
+  } else {
+    startMathGame();
+  }
+}
+
+// ── Init ──
+window.speechSynthesis.onvoiceschanged=()=>{window.speechSynthesis.getVoices();};
 switchLang('en');
 </script>
 </body>
