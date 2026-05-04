@@ -445,23 +445,7 @@
       </div>
       <div class="word-display"><div class="word-letters" id="word-letters"></div></div>
       <div id="choices-area"></div>
-      <div id="feedback-area" style="text-align:center;font-weight:bold;min-height:30px;margin-top:10px;"></div>
-      <!-- Word explanation card shown after each answer -->
-      <div id="explain-card" style="display:none;margin-top:14px;background:linear-gradient(135deg,#f0f8ff,#faf4ff);border-radius:16px;border:2px solid #d0e8ff;padding:16px;animation:slideUp 0.3s ease;">
-        <div id="explain-loading" style="text-align:center;color:var(--muted);font-size:0.9rem;">✨ Loading explanation...</div>
-        <div id="explain-content" style="display:none;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-            <span style="font-size:1.3rem;">📖</span>
-            <span id="explain-word" style="font-size:1.2rem;font-weight:bold;color:var(--sky);"></span>
-            <span id="explain-lang-badge" style="font-size:0.7rem;background:var(--sky);color:#fff;border-radius:50px;padding:2px 10px;font-weight:bold;"></span>
-          </div>
-          <p id="explain-meaning" style="color:var(--text);font-size:0.92rem;margin-bottom:10px;line-height:1.6;"></p>
-          <div style="background:#fff;border-radius:10px;padding:10px 14px;border-left:4px solid var(--purple);">
-            <span style="font-size:0.72rem;font-weight:bold;color:var(--purple);display:block;margin-bottom:4px;">✏️ Example / Contoh ayat:</span>
-            <p id="explain-sentence" style="color:var(--text);font-size:0.9rem;font-style:italic;line-height:1.6;margin:0;"></p>
-          </div>
-        </div>
-      </div>
+      <div id="feedback-area" style="text-align:center;font-weight:bold;height:30px;margin-top:10px;"></div>
       <div style="display:flex;gap:10px;justify-content:center;margin-top:20px;">
         <button class="btn btn-primary" onclick="speakWord()">🔊 Hear</button>
         <button class="btn btn-success" id="next-btn" onclick="nextWord()" style="display:none;">Next ➡️</button>
@@ -569,9 +553,9 @@ function makeSequencer(notes, bpm=120, masterVol=0.08) {
   const master = ctx.createGain();
   master.gain.value = masterVol;
 
-  // light reverb via gain
+  // reverb (convolver via impulse)
   const reverb = ctx.createGain();
-  reverb.gain.value = 0.15;
+  reverb.gain.value = 0.18;
   const dry = ctx.createGain();
   dry.gain.value = 1;
 
@@ -595,37 +579,39 @@ function makeSequencer(notes, bpm=120, masterVol=0.08) {
     o.stop(when + dur + 0.05);
   }
 
-  // ⚠️ FIX: use a LOCAL timerId captured in closure — never reference global trackScheduler here
-  let timerId = null;
-
   function tick() {
     if (!active) return;
-    const now = ctx.currentTime;
+    const ctx2 = getACtx();
+    const now = ctx2.currentTime;
     if (nextTime === 0) nextTime = now + 0.05;
 
-    // Schedule a 0.5s look-ahead buffer
+    // Schedule a buffer of 0.5s ahead
     while (nextTime < now + 0.5) {
       const note = notes[step % notes.length];
       scheduleNote(note, nextTime);
       nextTime += note.dur * beatDur;
       step++;
     }
-    timerId = setTimeout(tick, 150);
+    trackScheduler._timer = setTimeout(tick, 150);
   }
 
   tick();
-
-  return {
+  const stopper = {
     stop() {
       active = false;
-      clearTimeout(timerId);  // clears THIS track's timer only
+      clearTimeout(stopper._timer);
       try { master.disconnect(); reverb.disconnect(); dry.disconnect(); } catch(e){}
-    }
+    },
+    _timer: null
   };
+  trackScheduler = stopper;
+  return stopper;
 }
 
-// ── Bass layer (simple sine bass) — unused, kept for future ──
-// function makeBass(notes, bpm=120, vol=0.06) { ... }
+// ── Bass layer (simple sine bass) ──
+function makeBass(notes, bpm=120, vol=0.06) {
+  return makeSequencer(notes.map(n => ({...n, type:'sine', vol: n.vol||0.8})), bpm, vol);
+}
 
 // ══════════════════════════════════════════
 //  TRACK DEFINITIONS
@@ -849,32 +835,20 @@ function playWrongSound() {
 }
 
 function playFanfare() {
+  // Played on game complete (perfect score)
   try {
     const ctx = getACtx();
-    // Triumphant rising fanfare: C E G C E G C (high)
-    const melody = [
-      [NOTE.C4, 0, 0.15], [NOTE.E4, 0.13, 0.15], [NOTE.G4, 0.26, 0.15],
-      [NOTE.C5, 0.40, 0.25], [NOTE.E5, 0.60, 0.25], [NOTE.G5, 0.80, 0.35],
-      [NOTE.C6, 1.10, 0.6]
-    ];
-    melody.forEach(([freq, delay, dur]) => {
+    const melody = [523.25, 659.25, 783.99, 659.25, 783.99, 1046.5];
+    melody.forEach((freq, i) => {
       const o = ctx.createOscillator(), g = ctx.createGain();
       o.connect(g); g.connect(ctx.destination);
       o.type = 'triangle'; o.frequency.value = freq;
-      const t = ctx.currentTime + delay;
+      const t = ctx.currentTime + i * 0.13;
       g.gain.setValueAtTime(0, t);
-      g.gain.linearRampToValueAtTime(0.28, t + 0.02);
-      g.gain.setValueAtTime(0.28, t + dur * 0.7);
-      g.gain.exponentialRampToValueAtTime(0.001, t + dur);
-      o.start(t); o.stop(t + dur + 0.05);
+      g.gain.linearRampToValueAtTime(0.25, t + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+      o.start(t); o.stop(t + 0.32);
     });
-    // bass boom underneath
-    const ob = ctx.createOscillator(), gb = ctx.createGain();
-    ob.connect(gb); gb.connect(ctx.destination);
-    ob.type = 'sine'; ob.frequency.value = NOTE.C3;
-    gb.gain.setValueAtTime(0.18, ctx.currentTime + 1.1);
-    gb.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.8);
-    ob.start(ctx.currentTime + 1.1); ob.stop(ctx.currentTime + 1.9);
   } catch(e) {}
 }
 
@@ -1339,9 +1313,6 @@ function confirmSpellStart() {
 // ══════════════════════════════════════════
 function nextWord() {
   if(current>=testWords.length) return showComplete('spell');
-  // Hide explanation card from previous word
-  const card = document.getElementById('explain-card');
-  if(card) card.style.display = 'none';
   answerWord=testWords[current]; blankFills={}; missIdx=[]; fillPointer=0;
   document.getElementById('next-btn').style.display='none';
   document.getElementById('feedback-area').textContent='';
@@ -1382,66 +1353,7 @@ function checkSpell() {
   const fb=document.getElementById('feedback-area');
   if(win){score++;fb.textContent=T('feedCorrect');fb.style.color='var(--grass)';playCorrectSound();}
   else{fb.textContent=T('feedWas')+answerWord;fb.style.color='var(--coral)';playWrongSound();}
-  current++;
-  document.getElementById('next-btn').style.display='inline-flex';
-  // Show explanation card
-  showExplainCard(answerWord);
-}
-
-function showExplainCard(word) {
-  const card = document.getElementById('explain-card');
-  const loading = document.getElementById('explain-loading');
-  const content = document.getElementById('explain-content');
-  card.style.display = 'block';
-  loading.style.display = 'block';
-  content.style.display = 'none';
-  document.getElementById('explain-word').textContent = word;
-  document.getElementById('explain-lang-badge').textContent = language === 'bm' ? '🇲🇾 BM' : '🇬🇧 EN';
-  fetchWordExplanation(word);
-}
-
-async function fetchWordExplanation(word) {
-  const isBM = language === 'bm';
-  const prompt = isBM
-    ? `Kamu adalah kamus kanak-kanak Bahasa Malaysia yang mesra dan mudah difahami.
-Untuk perkataan "${word}", berikan:
-1. Maksud ringkas dalam Bahasa Malaysia (1-2 ayat, sesuai untuk kanak-kanak 5-10 tahun)
-2. Satu contoh ayat (bina ayat) menggunakan perkataan "${word}" dalam Bahasa Malaysia
-
-Balas HANYA dalam format JSON ini, tiada teks lain:
-{"meaning":"...","sentence":"..."}`
-    : `You are a friendly children's dictionary for ages 5-10.
-For the word "${word}", provide:
-1. A simple meaning in English (1-2 sentences, easy words)
-2. One example sentence using "${word}"
-
-Reply ONLY with this exact JSON, nothing else:
-{"meaning":"...","sentence":"..."}`;
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 300,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
-    const data = await res.json();
-    const text = (data.content || []).map(b => b.text || '').join('');
-    const parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
-    document.getElementById('explain-meaning').textContent = parsed.meaning || '';
-    document.getElementById('explain-sentence').textContent = parsed.sentence || '';
-    document.getElementById('explain-loading').style.display = 'none';
-    document.getElementById('explain-content').style.display = 'block';
-  } catch(e) {
-    document.getElementById('explain-loading').textContent = '⚠️ Could not load explanation.';
-  }
+  current++; document.getElementById('next-btn').style.display='inline-flex';
 }
 function speakWord() {
   if(!window.speechSynthesis||!answerWord) return;
